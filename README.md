@@ -123,7 +123,7 @@ GeoLayoutLM achieves highly competitive scores in the SER task, and significantl
 ## Environment
 The dependencies are listed in `requirements.txt`. Please install a proper torch version matching your cuda version first.
 ```
-pip install -r requirements.txt
+pip install -r Geo_LayoutLM/training_main/main/requirements_new.txt
 ```
 
 ## Model Checkpoints
