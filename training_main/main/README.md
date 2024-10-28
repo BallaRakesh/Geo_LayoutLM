@@ -59,9 +59,11 @@ Note : make sure you have made these changes
 => num_classes = << change to no.of classes >>
 3) every time reupload the 'geolayoutlm_large_pretrain.pt' to the path : geo-layout-lm-tf/
 ```
-
+ONLY FOR INFERENCE
 ## Running the results generation script
 1. Run the evaluation script to generated necessary result files and visualizations (note that visualization is correctly prepared only when running 'linking' model and visualization related to entity linking)
+1) python funsd_gv.py
+2) preprocess_for_val_data_2.py
 
 ```
 python inference.py --config=configs/val_config.yml 
