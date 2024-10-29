@@ -68,6 +68,7 @@ img_path = config['PATH']['DATA']
 
 
 def load_model_weight(net, pretrained_model_file):
+    pretrained_model_file = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/epoch=16-f1_labeling=0.8964.pt'
     print("Loading ckpt from:", pretrained_model_file)
     print("HERE")
     pretrained_model_state_dict = torch.load(pretrained_model_file, map_location="cpu")
@@ -353,7 +354,7 @@ def get_geo_result_final(image_base64, file_name, OCR_path):
         flag=1
     # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
     img_path = os.path.join(img_path, file_name)
-    ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
+    ocr_file = file_name.replace('.png', '.png_textAndCoordinates.txt')
 
     # with open(all_words_path, 'r') as file:
     #     all_words_ = json.load(file)
@@ -386,9 +387,9 @@ def get_geo_result_final(image_base64, file_name, OCR_path):
 
 
 if __name__ == '__main__':
-    images_path = '/media/ntlpt19/5250315B5031474F/ingram_rakesh_data/eval_data/Images'
-    data_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/data'
-    OCR_path = '/media/ntlpt19/5250315B5031474F/ingram_rakesh_data/eval_data/OCR'
+    images_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/EVAL_data/Images'
+    data_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/EVAL_data/data'
+    OCR_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/header_detection_files/OCR'
     for images_files in os.listdir(images_path):
         if not os.path.exists(os.path.join(data_path, images_files)):
             image_base64_ = image_to_base64(os.path.join(images_path, images_files))

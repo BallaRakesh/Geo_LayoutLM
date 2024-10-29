@@ -25,7 +25,7 @@ from glob import glob
 import imagesize
 from transformers import BertTokenizer
 from typing import Dict
-
+# from constants import gv_key_path
 
 def denormalize(h, w, bbox, denom=2):
     """
@@ -149,6 +149,11 @@ def get_text(ocr_region, labelled_region, words_coords=None, words=None, all_wor
 def preprocessData(json_file:Dict, dataset_split:str, input_path, file:str, data_folder=None, MAX_SEQ_LENGTH = 512, MODEL_TYPE = "bert", 
                     VOCA = "bert-base-uncased", anno_dir="annotations"):
     tokenizer = BertTokenizer.from_pretrained(VOCA, do_lower_case=True)
+    
+    
+    
+    ######################################################
+    ######################################################
     OUTPUT_PATH = os.path.join(input_path, "dataset/custom_geo")
     os.makedirs(OUTPUT_PATH, exist_ok=True)
     os.makedirs(os.path.join(OUTPUT_PATH, "preprocessed"), exist_ok=True)
@@ -169,7 +174,11 @@ def preprocessData(json_file:Dict, dataset_split:str, input_path, file:str, data
 
     else:
         raise ValueError(f"Invalid dataset_split={dataset_split}")
-
+    
+    
+    ###################################################################################
+    ###################################################################################
+    ###################################################################################
     # json_files = glob(os.path.join(dataset_root_path, anno_dir, "*.json"))
     preprocessed_fnames = []
     # for json_file in tqdm(json_files):
@@ -262,7 +271,7 @@ def preprocessData(json_file:Dict, dataset_split:str, input_path, file:str, data
     preprocessed_fnames= os.path.join("preprocessed", this_file_name)
     print(preprocessed_fnames)
     # exit('+++++++++++++++++++')
-
+    
     # Save to file
     data_obj_file = os.path.join(OUTPUT_PATH, "preprocessed", this_file_name)
     with open(data_obj_file, "w", encoding="utf-8") as fp:
@@ -275,23 +284,55 @@ def preprocessData(json_file:Dict, dataset_split:str, input_path, file:str, data
     with open(preprocessed_filelist_file, "a", encoding="utf-8") as fp:
         fp.write(preprocessed_fnames+"\n")
 
-def __preprocess__(data:dict, file:str,data_folder:str, train_images_path:str, thresh: int):
-        print('Enter into preprocess stage+++++++++++++++++++++++++++++++++')
-        final_data=[]
-        for i, item in enumerate(data):
-            final_data.append(data[item])
-            if  (i+1)%thresh==0:
-                file_name= file + "_s_" + str(int((i + 1) / thresh))
-                shutil.copy2(os.path.join(train_images_path,file+'.png'),os.path.join(f'{data_folder}/images',file_name+'.png'))
-                print(f"final_data :{final_data}")
-                with open(os.path.join(os.path.join(f'{data_folder}/annotations',file_name+'.json')), 'w') as f:
-                    json.dump({"form" : final_data}, f, indent=4)
-                final_data.clear()
-            if len(final_data)!=0:
-                file_name= file + "_s_" + str(int(len(data) /thresh) + 1)
-                shutil.copy2(os.path.join(train_images_path,file+'.png'),os.path.join(f'{data_folder}/images',file_name+'.png')) 
-                with open(os.path.join(os.path.join(f'{data_folder}/annotations',file_name+'.json')), 'w') as f:
-                    json.dump({"form" : final_data}, f, indent=4)
+
+
+
+def __preprocess__(data:dict,thresh: int, file: str, data_folder, train_images_path:str):
+    print('Enter into preprocess stage+++++++++++++++++++++++++++++++++')
+    
+    
+    final_result = []
+    
+    final_data=[]
+    print(data)
+    # exit('>>>>>')
+    for i, item in enumerate(data):
+        print(i)
+        print(data[item])
+        final_data.append(data[item])
+        if  (i+1)%thresh==0:
+            print("appending to the final_result >>>>", file)
+            ###################################################################
+            ###################################################################
+            file_name= file + "_s_" + str(int((i + 1) / thresh))
+            shutil.copy2(os.path.join(train_images_path,file+'.png'),os.path.join(f'{data_folder}/images',file_name+'.png'))
+            print(f"final_data :{final_data}")
+            ###################################################################
+            
+            final_result.append({"form" : final_data})
+            ###################################################################
+            with open(os.path.join(os.path.join(f'{data_folder}/annotations',file_name+'.json')), 'w') as f:
+                json.dump({"form" : final_data}, f, indent=4)
+            ###################################################################
+                
+            final_data = []
+            
+            
+    if len(final_data)!=0:
+        print('entered here >>>>>>>>>>>>>>>>> **************')
+        ###################################################################
+        file_name= file + "_s_" + str(int(len(data) /thresh) + 1)
+        shutil.copy2(os.path.join(train_images_path,file+'.png'),os.path.join(f'{data_folder}/images',file_name+'.png')) 
+        # ###################################################################
+        
+        final_result.append({"form" : final_data})
+            ###################################################################
+        with open(os.path.join(os.path.join(f'{data_folder}/annotations',file_name+'.json')), 'w') as f:
+            json.dump({"form" : final_data}, f, indent=4)
+            # ###################################################################
+    print(final_result)
+    return final_result
+                    
 def findOtherCategory(word_box: List, key_box:List, value_box: List):
     print(f'word box: {word_box}')
     print(f'key box: {key_box}')
@@ -304,25 +345,41 @@ def findOtherCategory(word_box: List, key_box:List, value_box: List):
             return False
         else:
             return True
+        
+        
 def main():
-    root_path = "/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/CS_complete_data/validation_data_for_word_linking"
+    root_path = "/home/gpu1admin/rakesh/geo_testing/data_oct21"
     ocr_path = os.path.join(root_path, "custom_data/key_val_sets")
     all_words_path = os.path.join(root_path, "custom_data/all_words")
+    save_to_ = os.path.join(root_path, "val_inference_files")
+    if not os.path.exists(save_to_):
+        os.mkdir(save_to_)
     save_to = os.path.join(root_path, "val_inference_files/validation_set")
-    # if not os.path.exists(save_to):
-    #     os.mkdir(save_to)
+    if not os.path.exists(save_to):
+        os.mkdir(save_to)
     os.makedirs(save_to, exist_ok=True)
     os.makedirs(os.path.join(save_to, 'images'), exist_ok=True)
     os.makedirs(os.path.join(save_to, 'annotations'), exist_ok=True)
     images_path = os.path.join(root_path, 'Images')
+    labels_path = os.path.join(root_path, 'Labels')
+    labels_list = os.listdir(labels_path)
+    labels_list= [labels.split('.txt')[0] for labels in labels_list]
     images_list = os.listdir(images_path)
     print(images_list)
     images_list= [images.split('.png')[0] for images in images_list]
-    for file in images_list:
-        with open(os.path.join(all_words_path, file+'.json'), 'r')   as f:
-            all_words = json.load(f)
-        with open(os.path.join(ocr_path, file+'.json') , 'r') as f:
-            ocr_labels = json.load(f)
+    
+    all_words_ = os.listdir(all_words_path)
+    for file in all_words_:
+        # ocr_path= os.path.join(ocr_path, file+'.json')
+        # with open(os.path.join(all_words_path, file), 'rb')   as f:
+        #     all_words = json.load(f, encoding='utf-8')
+            
+        with open(os.path.join(all_words_path, file), 'r') as file_in:
+            content = file_in.read()  # Reads the entire file content
+        file_in.close()
+            # print(content)  # Display the content
+        all_words = ast.literal_eval(content)
+        file = file.replace('.json', '')
         key_dict={}
         other_contr=0
         for i, ocr_coord in enumerate(all_words):
@@ -342,16 +399,107 @@ def main():
         # print(key_dict)
         print(f'the number of elements: {len(key_dict)}')
         if len(key_dict)<=150:
+            
+            final_data = [key_dict[item] for item in key_dict]
+            
+            final_result =  [{"form" : final_data}]
+            
+            
             print(f'the elements less than 150+++++++++++++++++++++++++++++')
             shutil.copy2(os.path.join(images_path, file+'.png'), os.path.join(save_to, 'images'))
-            final_data = [key_dict[item] for item in key_dict]
             with open(os.path.join(save_to,'annotations',file+'.json'), 'w') as f:
                 json.dump({"form" : final_data}, f, indent=4)
+                
         else:
-            __preprocess__(key_dict, file, save_to, images_path, 100)
+            final_result = __preprocess__(key_dict, 150, file, save_to, images_path)
+            print(final_result)
+    # return final_result
+
+from base64 import b64encode
+from google.cloud import vision
+def get_ocr_vision_api(image_path):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = ""#gv_key_path
+    with open(image_path, 'rb') as f:
+        ctxt = b64encode(f.read()).decode()
+    client = vision.ImageAnnotatorClient()
+    image = vision.Image(content = ctxt)
+
+    response = client.text_detection(image=image)
+
+    word_coordinates = []
+    all_text = ""
+
+    for i,text in enumerate(response.text_annotations):
+        if i != 0:
+            # print('=' * 30)
+            # print(text.description)
+            vertices = [(v.x, v.y) for v in text.bounding_poly.vertices]
+            x1 = min([v.x for v in text.bounding_poly.vertices])
+            x2 = max([v.x for v in text.bounding_poly.vertices])
+            y1 = min([v.y for v in text.bounding_poly.vertices])
+            y2 = max([v.y for v in text.bounding_poly.vertices])
+            # print('bounds: ' + str(vertices))
+            if x2 - x1 == 0:
+                x2 += 1
+            if y2 - y1 == 0:
+                y2 += 1
+            word_coordinates.append({
+                "word": text.description,
+                "left": x1,
+                "top": y1,
+                "width": x2 - x1,
+                "height": y2 - y1,
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2
+                })
+        else:
+            all_text = text.description
+
+    return word_coordinates, all_text
+
+import ast
+def gv_data(img_path, ocr_file = False):
+    
+    # for j in os.listdir(ocr_file):
+    #     print(j[0:-9])
+    #     with open(os.path.join(ocr_file, j), "r") as f:
+    #         word_coordinates = json.load(f)['word_coordinates']
+    #     f.close()
+    if ocr_file:
+        # Open the file in read mode
+        with open(ocr_file, 'r') as file:
+            content = file.read()  # Reads the entire file content
+            # print(content)  # Display the content
+        word_coordinates = ast.literal_eval(content)
+    else:
+        print('NO data available')
+        return None
+        # word_coordinates,all_text = get_ocr_vision_api(img_path)
+        
+    cou = 1
+    final = {}
+    import json
+    for i in word_coordinates:
+        final[cou]={'text':i['word'], 'bbox':[i['x1'],i['y1'],i['x2'], i['y2']]}
+        cou+=1
+            
+            
+        # print(final)
+        # file_name = os.path.join(all_words_path, j[0:-9]+'.json')
+        # with open(file_name, "w") as json_file:
+        #     json.dump(final, json_file)
+        
+            
+    return final
+
+
+
 if __name__=="__main__":
-    main()
-    preproces_root_path= "/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/CS_complete_data/validation_data_for_word_linking/val_inference_files"
+    main()  #filtering is done 
+    
+    preproces_root_path= "/home/gpu1admin/rakesh/geo_testing/data_oct21/val_inference_files"
     preprocess_input_path= os.path.join(preproces_root_path,'validation_set')
     images_path= os.path.join(preprocess_input_path,'images')
     annotation_path= os.path.join(preprocess_input_path,'annotations')
@@ -365,8 +513,3 @@ if __name__=="__main__":
     shutil.copytree(preprocess_input_path, os.path.join(preproces_root_path, "dataset/custom_geo",'validation_set'))
 
     print('########## Done ################')
-    
-    
-
-
-
