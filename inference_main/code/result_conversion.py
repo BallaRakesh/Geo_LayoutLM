@@ -53,8 +53,8 @@ def process_files_in_folder(input_folder, output_folder):
 
 # Main function to specify input/output folders
 def main():
-    input_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/results_epoch10'
-    output_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/final_results_epoch10'  # Replace with your output folder path
+    input_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/results'
+    output_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/final_results'
     process_files_in_folder(input_folder, output_folder)
 
 if __name__ == '__main__':

@@ -26,7 +26,7 @@ from scipy.special import softmax
 from fuzzywuzzy import fuzz
 import psutil
 import torchvision.transforms as transforms
-
+from constants import vertical_merge_labels, single_text_labels, master_keys
 transform2 = transforms.ToPILImage()
 transform = transforms.ToTensor()
 
@@ -37,6 +37,67 @@ def contour_sort(a, b):
 	if abs(a[1][1] - b[1][1]) <= 15:
 		return a[1][0] - b[1][0]
 	return a[1][1] - b[1][1]
+
+def are_on_same_line(bbox1, bbox2, min_distance=0, tolerance=10):
+    # Check if the vertical distance between the bottom of bbox1 and the top of bbox2 is within the tolerance
+    # and if the overall distance is at least min_distance
+    return (
+        abs(bbox2[1] - bbox1[1]) <= tolerance
+        and abs(bbox2[0] - bbox1[2]) >= min_distance
+    )
+
+def group_tokens_by_line(bbox_data, line_tolerance=5):
+    all_bboxes_ = []
+    line_wise_index = {}
+    initial_bbox = []
+    # Create sublists of OCR data in the same line with horizontal tolerance
+    idx = 0
+    for master_bbox in bbox_data:
+        check_flag = False
+        bbox = master_bbox
+        if bbox not in all_bboxes_:
+            all_bboxes_.append(bbox)
+            line_wise_index[idx] = [bbox]
+            check_flag = True
+
+        if check_flag:
+            prev_bbox = line_wise_index[idx][0]
+            print("prev_bbox >>>>>>>>>>>", prev_bbox)
+            for single_bbox in bbox_data:
+                print('single_bbox>>>>>>>>>>>>>', single_bbox)
+                if are_on_same_line(prev_bbox, single_bbox, tolerance=line_tolerance):
+                    if single_bbox not in all_bboxes_:
+                        line_wise_index[idx].append(single_bbox)
+                        all_bboxes_.append(single_bbox)
+            line_wise_index[idx].sort(key=lambda x: x[0])
+            initial_bbox.append(line_wise_index[idx][0])
+            idx += 1
+    print(initial_bbox)
+    initial_bbox.sort(key=lambda x: x[1])
+    print(initial_bbox)
+    updated_line_wise_data = []
+    for bx in initial_bbox:
+        for idx, values in line_wise_index.items():
+            if bx in values:
+                updated_line_wise_data.append(values)
+    
+    
+    return updated_line_wise_data
+
+def validate_contour_sort(word_bbox):
+	all_bboxes = []
+	for i in word_bbox:
+		all_bboxes.append(i[-1])
+	print(all_bboxes)
+	final_word_bbox = []
+	ordered_bbox = group_tokens_by_line(all_bboxes)
+	for values in ordered_bbox:
+		for val in values:
+			for j in word_bbox:
+				if j[-1] == val:
+					final_word_bbox.extend([j])
+	return final_word_bbox
+
 def minimum_distance_horizontal(bb1, bb2):
     # Calculate the minimum horizontal distance between two bounding boxes
     x1_bb1, y1_bb1, x2_bb1, y2_bb1 = bb1
@@ -56,7 +117,8 @@ def minimum_distance_horizontal(bb1, bb2):
 #     min_distance_y = min(abs(y1_bb2 - y2_bb1), abs(y1_bb1 - y2_bb2))
 
 #     return min(min_distance_x, min_distance_y)
-def minimum_distance_vertical(bb1, bb2):
+
+def minimum_distance_vertical_old(bb1, bb2):
     # Calculate the minimum vertical distance between two bounding boxes
     x1_bb1, y1_bb1, x2_bb1, y2_bb1 = bb1
     x1_bb2, y1_bb2, x2_bb2, y2_bb2 = bb2
@@ -64,6 +126,41 @@ def minimum_distance_vertical(bb1, bb2):
     min_distance_y = min(abs(y1_bb2 - y2_bb1), abs(y1_bb1 - y2_bb2))
 
     return min_distance_y
+
+
+def minimum_distance_vertical(bb1, bb2):
+	# Calculate the minimum vertical distance between two bounding boxes
+	x1_bb1, y1_bb1, x2_bb1, y2_bb1 = bb1
+	x1_bb2, y1_bb2, x2_bb2, y2_bb2 = bb2
+	'''
+	top to middle
+	X-coordinate: x2
+	Y-coordinate: ((y1_bb1 + y2_bb1) / 2 + y1_bb1) / 2 
+	bottom to middle
+	X-coordinate: x2
+	Y-coordinate: ((y1_bb1 + y2_bb1) / 2 + y2_bb1) / 2
+	'''
+	min_distance_y = min(abs(y1_bb2 - y2_bb1), abs(y1_bb1 - y2_bb2), abs(y1_bb1 - y1_bb2), abs(y2_bb1 - y2_bb2), abs(y1_bb2 - (((y1_bb1 + y2_bb1) / 2 + y1_bb1) / 2)), abs(y2_bb2 - (((y1_bb1 + y2_bb1) / 2 + y2_bb1) / 2)))
+
+	return min_distance_y
+
+
+def check_vertical_indetween(bb1, bb2):
+	in_between_flag = False
+	# Calculate the minimum vertical distance between two bounding boxes
+	x1_bb1, y1_bb1, x2_bb1, y2_bb1 = bb1
+	x1_bb2, y1_bb2, x2_bb2, y2_bb2 = bb2
+	
+	'''
+	X-coordinate: x2
+	Y-coordinate: ((y1 + y2) / 2 + y1) / 2
+	'''
+ 
+	if (y1_bb2 < y1_bb1 < y2_bb2) or (y1_bb2 < y2_bb1 > y2_bb2) or (y1_bb1 < y1_bb2 < y2_bb1) or (y1_bb1 < y2_bb2 < y2_bb1):
+		in_between_flag = True
+	return in_between_flag
+
+
 
 def get_iou_horizontal(bb1, bb2):
     # Calculate the Intersection over Union (IoU) of two bounding boxes (horizontal intersection)
@@ -205,7 +302,26 @@ def get_iou_new(bb1, bb2):
 	assert iou >= 0.0
 	assert iou <= 1.0
 	return iou
-def minimum_distance(bb1, bb2):
+
+def calculate_orientation(word_bbox):
+	vertical_alignment_bbox = False
+	# Calculate centroids of characters
+	centroids = [(bbox[0] + bbox[2]) / 2 for bbox in word_bbox]
+
+	# Calculate angle between horizontal axis and line connecting first and last centroids
+	delta_y = centroids[-1] - centroids[0]
+	delta_x = word_bbox[-1][2] - word_bbox[0][0]
+	angle = np.arctan2(delta_y, delta_x)
+
+	# Convert angle from radians to degrees
+	angle_degrees = np.degrees(angle)
+	print(angle_degrees)
+	if angle_degrees < -50:
+		vertical_alignment_bbox = True
+	return vertical_alignment_bbox
+
+
+def minimum_distance_old(bb1, bb2):
 	# bb1 points
 	min_distance = 9999999999
 	p_11 = np.array((bb1[0], bb1[1]))
@@ -226,12 +342,48 @@ def minimum_distance(bb1, bb2):
 				min_distance = dist
 	return min_distance
 
+
+
+def minimum_distance(bb1, bb2):
+	# bb1 points
+	min_distance = 9999999999
+	p_11 = np.array((bb1[0], bb1[1]))
+	#(x2, (y1 + y2) / 2)
+	# p_12 = np.array((bb1[0], bb1[3]))
+	r_m_point = np.array((bb1[1], (bb1[3]+bb1[1])/2)) #???? r_m_point = np.array((bb1[2], (bb1[1] + bb1[3]) / 2))
+
+	p_13 = np.array((bb1[2], bb1[3]))
+	p_14 = np.array((bb1[2], bb1[1]))
+	# all_points_bb1 = [p_11, p_12, p_13, p_14]
+	all_points_bb1 = [p_11, p_13, p_14]#, r_m_point]
+	# bb2 points
+	p_21 = np.array((bb2[0], bb2[1]))
+	p_22 = np.array((bb2[0], bb2[3]))
+	p_23 = np.array((bb2[2], bb2[3]))
+	# p_24 = np.array((bb2[2], bb2[1]))
+	# all_points_bb2 = [p_21, p_22, p_23, p_24]
+	all_points_bb2 = [p_21, p_22, p_23]
+	for point1 in all_points_bb1:
+		for point2 in all_points_bb2:
+			dist = abs(np.linalg.norm(point1 - point2))
+			if dist < min_distance:
+				min_distance = dist
+	return min_distance
+
+def special_chr_check(bb_token, flag):
+	if ',' in bb_token:
+		flag = False
+	if '-' in bb_token:
+		flag = False
+	return flag
+
+
 def area(coordinates):
 	l = coordinates[2] - coordinates[0]
 	h = coordinates[3] - coordinates[1]
 	return l * h
 
-def merge_surrounding(data, model_output):
+def merge_surrounding_old(data, model_output):
 	new = data.copy()
 	print('entered into merging_surroundings ++++++++++++++++++++++++++++++++++++++')
 	for key in list(data.keys()):
@@ -298,6 +450,415 @@ def merge_surrounding(data, model_output):
 		else:
 			print("will continue")
 			continue
+
+
+
+import copy
+def merge_by_skipping_running(model_output, w, h, key, all_values):
+	print("entered final validation", all_values)
+	'''
+	[["500 , telangana , india", [161, 172, 308, 180], 67.32535079575597], =>1
+	["perak .", [290, 222, 329, 232], 84.68], =>2
+	["dusun kabupaten i pauh utara deli , kecamatan sumatera serdang 20374 , hamparan indonesia -", [65, 223, 285, 270], 91.24132404181185]],
+	                                          => 3 (need to merge 2 and 3)
+	'''
+	all_values = sorted(all_values, key=lambda bbox: bbox[1][0])#, reverse=True)
+	all_values = {idx: item for idx, item in enumerate(all_values)}
+	print("before starting", all_values)
+	no_of_ele_skip = 1
+	inx_ele_skip = [0]
+	current_itteration = 0
+	initial_check = True
+	inx_ele_skip_flag = True
+	len_idx_ele_skip = 1
+	while len(all_values)>2:# and no_of_ele_skip-1 < len(all_values)-2:
+		print('Before', all_values)
+		if inx_ele_skip_flag:
+			copied_inx_ele_skip = copy.deepcopy(inx_ele_skip)
+			inx_ele_skip_flag = False
+		if initial_check:
+			actual_length = len(all_values)
+			initial_check = False
+		deep_copied_all_values = copy.deepcopy(all_values)
+		all_values = after_skipping(all_values, inx_ele_skip)
+		print('after_skipping these indexes', inx_ele_skip)
+		print(all_values)
+		length = len(all_values)
+		print('>>>>>>>>>>>#################>>>>>>>>>>>>>>>>>>>>>>>>')
+		print('>>>>>>>>>>>#################>>>>>>>>>>>>>>>>>>>>>>>>')
+		# all_values = data[key]
+		# for sort_idx in range(0,4):
+		bboxes = [x[1] for x in all_values.values()]
+		vertical_alignment_bbox = calculate_orientation(bboxes)
+		vertical_alignment_bbox = False
+		print(key, ">>>>>>> vertical_alignment_bbox >>>>>>>>>", vertical_alignment_bbox)
+		# eps_horizontal = 100  # Threshold for horizontal merging
+		# eps_vertical = 50  # Threshold for vertical merging
+		# eps_vertical2 = 100  # Threshold for vertical merging
+		eps_horizontal = round(w*5.5/100)#100
+		eps_vertical = round(h*2.5/100) #100
+		eps_vertical2 = 100  # Threshold for vertical merging
+		if length > 1:
+			i = 0
+			while i in range(length - 1):
+				print(i)
+				bb1 = list(all_values.values())[i][1]
+				bb2 = list(all_values.values())[i + 1][1]
+				bb1_token = list(all_values.values())[i][0]
+				bb2_token = list(all_values.values())[i + 1][0]
+				confs = [list(all_values.values())[i][2], list(all_values.values())[i + 1][2]]
+				min_dist_horizontal = minimum_distance(bb1, bb2)
+				min_dist_vertical = minimum_distance_vertical(bb1, bb2)
+				vertical_flag = check_vertical_indetween(bb1, bb2)
+				try:
+					IOU_horizontal = get_iou_horizontal(bb1, bb2)
+					IOU_vertical = get_iou_vertical(bb1, bb2)
+					inter_percentage = get_intersection_percentage(bb1, bb2)
+				except:
+					i = i + 1
+					continue
+				bb1_x1, bb1_y1, bb1_x2, bb1_y2 = bb1
+				bb2_x1, bb2_y1, bb2_x2, bb2_y2 = bb2
+				bb1_width = bb1_x2 - bb1_x1
+				bb1_height = bb1_y2 - bb1_y1
+				bb2_width = bb2_x2 - bb2_x1
+				bb2_height = bb2_y2 - bb2_y1
+				# if len(bb1_token)<3:
+				print('beore', bb2_width, bb2_height)
+				print('bb2_token length', len(bb2_token))
+				flag1 = True
+				flag2 = True
+				flag1 = special_chr_check(bb1_token, flag1)
+				flag2 = special_chr_check(bb2_token, flag2)
+
+				if len(bb1_token) == 1 or (len(bb1_token) < 3 and flag1 == False):
+					temp = bb1_width
+					bb1_width = bb1_height
+					bb1_height = temp
+				if len(bb2_token) == 1 or (len(bb2_token) < 3 and flag2 == False):
+					temp = bb2_width
+					bb2_width = bb2_height
+					bb2_height = temp
+				print('flag2', flag2)
+				print('bb2_token', bb2_token)
+				print('bb1_width', bb1_width, 'bb1_height', bb1_height)
+				print('bb2_width', bb2_width, 'bb2_height', bb2_height)
+
+				# if (bb1_height >= bb1_width and bb2_height >= bb2_width) or (
+				# 		bb1_height <= bb1_width and bb2_height <= bb2_width):
+
+				print('entered into first if')
+				print(">>>>>>>>>>RRRRRRRRAAAAAAAAAKKKKKKKEEE", min_dist_horizontal)
+				if key in master_keys or vertical_alignment_bbox:
+					merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) or (
+							min_dist_vertical <= eps_vertical2 or IOU_vertical > 0 or inter_percentage)
+				else:
+					merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) and (
+							min_dist_vertical <= eps_vertical or IOU_vertical > 0 or inter_percentage)# or vertical_flag) 
+				print('min_dist_vertical', min_dist_vertical)
+				print("IOU_horizontal > 0 or inter_percentage", IOU_horizontal, inter_percentage)
+				if merge_flag:
+					print('entered into second if')
+					print("merging: " + list(all_values.values())[i][0] + " and " + list(all_values.values())[i + 1][0])
+					x_left = min(bb1[0], bb2[0])
+					y_top = min(bb1[1], bb2[1])
+					x_right = max(bb1[2], bb2[2])
+					y_bottom = max(bb1[3], bb2[3])
+					box = [x_left, y_top, x_right, y_bottom]
+					text = model_output_sum(key, box, model_output)
+					print("merged text is ", text)
+					avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+					new_value = [text, box, avg_confs]
+					print(new_value)
+					print(all_values)
+					print(i)
+					deletionkey = next((k for k, v in all_values.items() if v == list(all_values.values())[i + 1]), None)
+					updation_key = next((k for k, v in all_values.items() if v == list(all_values.values())[i]), None)
+					print('deletion_key >>>>>>>>>>',deletionkey)
+					print('updation_key >>>>>>>',updation_key)
+					del all_values[deletionkey]        # we are deleting the right value/ after value and updating the left/previous value
+					all_values[updation_key] = new_value
+     
+					# all_values.remove(all_values[i])
+					# # all_values.remove(all_values[i]) ############??????
+					# all_values.insert(i, new_value)
+     
+					print(all_values)
+					length = len(all_values)
+					if length == 1:
+						print("will break")
+						break
+					# else:
+					# 	print("distance is very high")
+					# 	i = i + 1
+				else:
+					i = i + 1
+     
+			print('after', inx_ele_skip, '$$$$$$$', all_values)
+			######################################################
+			######################################################
+			#adding the skipped elements
+			for itter_idx in inx_ele_skip:
+				all_values[itter_idx] = deep_copied_all_values[itter_idx]
+			print('After', all_values)
+   
+			#### sorting the values
+			all_values = dict(sorted(all_values.items()))
+   
+			# updating the index with 1
+			# for idx_, itter_idx_up in enumerate(inx_ele_skip):
+			if max(all_values.keys()) not in inx_ele_skip:
+				idx_ = 0
+				increment_value = 1
+				while idx_ < len(inx_ele_skip):
+					req_val = inx_ele_skip[idx_] + increment_value
+					if req_val in all_values:
+						inx_ele_skip[idx_] = req_val
+						idx_ = idx_ + 1
+						increment_value = 1
+					else:
+						increment_value += 1
+				######### break
+    
+    
+			if max(all_values.keys()) in inx_ele_skip:
+				initial_check = True
+				if actual_length > len(all_values):
+					inx_ele_skip = copied_inx_ele_skip
+					inx_ele_skip_flag = True
+				else:
+					len_idx_ele_skip +=1
+					inx_ele_skip = sorted(all_values.keys())[:len_idx_ele_skip]
+     
+			if len_idx_ele_skip+1 == len(all_values):
+				print('i need to break here')
+				print(inx_ele_skip)
+				print(len_idx_ele_skip+2)
+				print(len(all_values))
+				break
+		else:
+			break
+		
+
+		print(all_values)
+	return [item for item in all_values.values()]
+
+def merge_surrounding(data, model_output, w, h):
+	# print('start>>>>>>>>>>>>')
+	# print(data)
+	# print(model_output)
+	# print(w, h)
+	new = data.copy()
+	print('entered into merging_surroundings ++++++++++++++++++++++++++++++++++++++')
+	for key in list(data.keys()):
+		print(key)
+		if key in vertical_merge_labels or key in master_keys:
+			# for validate in range(0,2):
+			all_values = data[key]
+   
+			for sort_idx in range(0,4): #uncomment this later ####################################################
+				########################################################################################################
+				########################################################################################################
+				# sort_idx = 0
+				print('STARTED FOR ####### ITTERATION',sort_idx)
+				bboxes = [x[1] for x in all_values]
+				vertical_alignment_bbox = calculate_orientation(bboxes)
+				print('vertical_alignment_bbox -->', vertical_alignment_bbox)
+				vertical_alignment_bbox = False
+				all_values = sorted(all_values, key=lambda bbox: bbox[1][sort_idx])
+				print(f"sorting the values on the base of {sort_idx} ##### >>>>> {all_values}")
+				'''
+				[["house - 400 021 ,", [1291, 501, 1366, 532], 71.82], ["245 , martamo house cama road , mumbai", [1068, 516, 1300, 532], 81.86662341004609]]
+				'''
+				if len(all_values) > 1:
+					# all_values = vertical_horizontal_values(new_all_values)
+					# if key=='drawee_address':
+					#     print(all_values)
+					#     exit("PPPPPPPPPPPP")
+					bboxes = [x[1] for x in data[key]]
+					# eps_horizontal = 90  # Threshold for horizontal merging
+					# eps_vertical = 50  # Threshold for vertical merging
+					eps_horizontal = round(w*5.5/100)#100
+					eps_vertical = round(h*2.5/100) #100
+					eps_vertical2 = 100  # Threshold for vertical merging
+					######################
+					# if w>h:
+					#     eps_horizontal = round(h*17/100)#100
+					#     eps_vertical = round(w*12/100) #100
+					# else:
+					#     eps_horizontal = round(h*12/100)#100
+					#     eps_vertical = round(w*17/100) #100
+					############################
+					# all_values = data[key]
+					print(all_values)
+					# for all_values in new_all_values:
+					length = len(all_values)
+					if length > 1:
+						i = 0
+						# if (bb1_height > bb1_width and bb2_height > bb2_width) or (bb1_height < bb1_width and bb2_height < bb2_width):
+						while i in range(length - 1):
+							print(i)
+							bb1 = all_values[i][1]
+							bb2 = all_values[i + 1][1]
+							bb1_token = all_values[i][0]
+							bb2_token = all_values[i + 1][0]
+							print(f"TOKENS GOING CHECKING FOR MERGING >> {bb1_token} >>and>> {bb2_token}")
+		
+							confs = [all_values[i][2], all_values[i + 1][2]]
+							min_dist_horizontal = minimum_distance(bb1, bb2)
+							min_dist_vertical = minimum_distance_vertical(bb1, bb2)
+							vertical_flag = check_vertical_indetween(bb1, bb2)
+							try:
+								IOU_horizontal = get_iou_horizontal(bb1, bb2)
+								IOU_vertical = get_iou_vertical(bb1, bb2)
+								inter_percentage = get_intersection_percentage(bb1, bb2)
+							except:
+								i = i + 1
+								continue
+							bb1_x1, bb1_y1, bb1_x2, bb1_y2 = bb1
+							bb2_x1, bb2_y1, bb2_x2, bb2_y2 = bb2
+							bb1_width = bb1_x2 - bb1_x1
+							bb1_height = bb1_y2 - bb1_y1
+							bb2_width = bb2_x2 - bb2_x1
+							bb2_height = bb2_y2 - bb2_y1
+							# if len(bb1_token)<3:
+							print('beore', bb2_width, bb2_height)
+							print('bb2_token length', len(bb2_token))
+							flag1 = True
+							flag2 = True
+							flag1 = special_chr_check(bb1_token, flag1)
+							flag2 = special_chr_check(bb2_token, flag2)
+
+							if len(bb1_token) == 1 or (len(bb1_token) < 3 and flag1 == False):
+								temp = bb1_width
+								bb1_width = bb1_height
+								bb1_height = temp
+							if len(bb2_token) == 1 or (len(bb2_token) < 3 and flag2 == False):
+								temp = bb2_width
+								bb2_width = bb2_height
+								bb2_height = temp
+							print('flag2', flag2)
+							print('bb2_token', bb2_token)
+							print('bb1_width', bb1_width, 'bb1_height', bb1_height)
+							print('bb2_width', bb2_width, 'bb2_height', bb2_height)
+			
+							# if (bb1_height >= bb1_width and bb2_height >= bb2_width) or (
+							# 		bb1_height <= bb1_width and bb2_height <= bb2_width):
+			
+							print('entered into first if')
+							print(">>>>>>>>>>RRRRRRRRAAAAAAAAAKKKKKKKEEE", min_dist_horizontal)
+							if key in master_keys or vertical_alignment_bbox:
+								merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) or (
+										min_dist_vertical <= eps_vertical2 or IOU_vertical > 0 or inter_percentage)
+							else:
+								merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) and (
+										min_dist_vertical <= eps_vertical or IOU_vertical > 0 or inter_percentage)# or vertical_flag) 
+								print("Yes entered in the else block", merge_flag)
+							print('min_dist_vertical', min_dist_vertical)
+							print(f"eps_horizontal = {eps_horizontal}, eps_vertical = {eps_vertical}")
+							print("IOU_horizontal > 0 or inter_percentage", IOU_horizontal, inter_percentage)
+							print("IOU_vertical > 0 or inter_percentage or vertical_flag", IOU_vertical, inter_percentage, vertical_flag)
+							if merge_flag:
+								print('entered into second if')
+								print("merging: " + all_values[i][0] + " and " + all_values[i + 1][0])
+								x_left = min(bb1[0], bb2[0])
+								y_top = min(bb1[1], bb2[1])
+								x_right = max(bb1[2], bb2[2])
+								y_bottom = max(bb1[3], bb2[3])
+								box = [x_left, y_top, x_right, y_bottom]
+								text = model_output_sum(key, box, model_output)
+								print("merged text is ", text)
+								avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+								new_value = [text, box, avg_confs]
+								print(new_value)
+								all_values.remove(all_values[i])
+								all_values.remove(all_values[i])
+								all_values.insert(i, new_value)
+								print(all_values)
+								length = len(all_values)
+								if length == 1:
+									print("will break")
+									break
+								# else:
+								# 	print("distance is very high")
+								# 	i = i + 1
+							else:
+								i = i + 1
+					else:
+						print("will continue")
+						continue
+			########################################################################################################
+			########################################################################################################
+			print('before merge_by_skipping_running', all_values)
+			data[key] = merge_by_skipping_running(model_output, w, h, key, all_values)\
+       
+			print("################# all_values #####################", all_values)
+			# data[key] = all_values
+		else:
+			print(f'Vertical merging not happening ++++++++++ {key} ++++++++++++++')
+			print(key)
+			bboxes = [x[1] for x in data[key]]
+			if w > h:
+				v_eps = 10#round(h * 1.5 / 100)  # 10round(number)
+				h_eps = 50 #36 #round(w * 5 / 100)  # 36
+			else:
+				v_eps = 10#round(h * 1.1 / 100)  # 10round(number)
+				h_eps = 50#36 #round(w * 5.8 / 100)  # 36
+			all_values = data[key]
+			print('all_values >>>>>>>>>>>', all_values)
+			length = len(all_values)
+			if length > 1:
+				i = 0
+				while i in range(length - 1):
+					print(i)
+					bb1 = all_values[i][1]
+					bb2 = all_values[i + 1][1]
+					confs = [all_values[i][2], all_values[i + 1][2]]
+					# ocr_confs = [all_values[i][3],all_values[i+1][3]]
+					# min_dist = minimum_distance(bb1, bb2)
+					vertical_distance = check_vertical_distribution(bb1, bb2)
+					# dist_bwt_words = (abs(bb1[2]-bb2[0])/w)*100
+					hori_distance = abs(bb1[2] - bb2[0])
+					print('min_dist========>', vertical_distance, 'bb1', bb1, 'bb2', bb2)
+					print('hori_distance ==========>', hori_distance)
+					try:
+						IOU = get_iou_new(bb1, bb2)
+						print('IOU>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', IOU)
+					except:
+						i = i + 1
+						continue
+					if (vertical_distance <= v_eps and hori_distance < h_eps) or IOU > 0.1:
+						print("merging: " + all_values[i][0] + " and " + all_values[i + 1][0])
+						x_left = min(bb1[0], bb2[0])
+						y_top = min(bb1[1], bb2[1])
+						x_right = max(bb1[2], bb2[2])
+						y_bottom = max(bb1[3], bb2[3])
+						box = [x_left, y_top, x_right, y_bottom]
+						text = model_output_sum(key, box, model_output)
+						print("merged text is ", text)
+						avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+						"""if "NA" in ocr_confs:
+                            avg_ocr_confs = "NA"
+                        else:
+                            avg_ocr_confs = ( ocr_confs[0]* area(bb1) + ocr_confs[1]*area(bb2) )/(area(bb1) + area(bb2))"""
+						new_value = [text, box, avg_confs]
+						print(new_value)
+						all_values.remove(all_values[i])
+						all_values.remove(all_values[i])
+						all_values.insert(i, new_value)
+						print(all_values)
+						length = len(all_values)
+						if length == 1:
+							print("will break")
+							break
+					else:
+						print("distance is very high")
+						i = i + 1
+			else:
+				print("will continue")
+				continue
+		
+
 
 def tuple_to_string(sen):
 	str_test = sen
@@ -426,10 +987,12 @@ def result_generation(img_path, token_data):
         temp = image.convert("L")
         image_data = np.asarray(temp)
         image = cv2.cvtColor(image_data, cv2.COLOR_GRAY2RGB)
+        
         # plt.imshow(image)
         # plt.show()
         # plt.close()
         arr = transform(image)
+        
         # try:
         #     with open(result_json) as f:
         #         token_data = json.load(f)['form']
@@ -462,7 +1025,82 @@ def result_generation(img_path, token_data):
                     result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords']])
         print(result_set)
         model_output = result_set.copy()
+        with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
+            json.dump(result_set, f)
+        f.close()
+        
         final_result_set = {}
+        
+        for k in list(result_set.keys()):
+            if k not in single_text_labels:
+                try:
+                    alpha = float(config[k]['ALPHA'])
+                except:
+                    alpha = float(config['Default']['ALPHA'])
+                if len(result_set[k]) > 1:
+                    print("++++++++++++++entry in this block+++++++++++")
+                    texts = [x[0] for x in result_set[k]]
+                    bboxes = [x[1] for x in result_set[k]]
+                    confs = [x[2] for x in result_set[k]]
+                    avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
+                    avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
+                    eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
+                    # if eps<=0.0:
+                    # 	eps=0.1
+                    clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
+                    label_set = set(clustering.labels_)
+                    for l in label_set:
+                        selected = list(np.where(clustering.labels_ == l)[0])
+                        selected_texts = [x for i, x in enumerate(texts) if i in selected]
+                        selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
+                        selected_confs = [x for i, x in enumerate(confs) if i in selected]
+                        text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
+                        text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
+                        text_boxes = validate_contour_sort(text_boxes)
+                        text_result = ""
+                        print(k)
+                        print(text_boxes)
+                        for tb in text_boxes:
+                            if text_result == "":
+                                text_result += tb[0]
+                            else:
+                                text_result += " " + tb[0]
+                        print(text_result)
+                        x1 = min([x[0] for x in selected_boxes])
+                        x2 = max([x[2] for x in selected_boxes])
+                        y1 = min([x[1] for x in selected_boxes])
+                        y2 = max([x[3] for x in selected_boxes])
+                        box_result = [x1, y1, x2, y2]
+                        conf_result = float(np.round(np.mean(selected_confs), 2))
+                        # print(box_result)
+                        if k not in list(final_result_set.keys()):
+                            final_result_set[k] = []
+                        final_result_set[k].append([text_result, box_result, conf_result])
+
+                else:
+                    if k not in list(final_result_set.keys()):
+                        final_result_set[k] = []
+                    final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+            else:
+                if len(result_set[k]) > 1:
+                    print("++++++++++++++entry in this block+++++++++++")
+                    texts = [x[0] for x in result_set[k]]
+                    bboxes = [x[1] for x in result_set[k]]
+                    confs = [x[2] for x in result_set[k]]
+                    for i, value in enumerate(zip(texts, bboxes, confs)):
+                        print(list(value))
+                        if k not in list(final_result_set.keys()):
+                            final_result_set[k] = []
+                        final_result_set[k].append(list(value))
+                else:
+                    if k not in list(final_result_set.keys()):
+                        final_result_set[k] = []
+                    final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+
+
+        
+        
+        '''
         for k in list(result_set.keys()):
             try:
                 alpha = float(config[k]['ALPHA'])
@@ -509,8 +1147,11 @@ def result_generation(img_path, token_data):
                 if k not in list(final_result_set.keys()):
                     final_result_set[k] = []
                 final_result_set[k].append([result_set[k][0][0],result_set[k][0][1]])  
+                '''
+                
+                
         print(final_result_set)
-        merge_surrounding(final_result_set, model_output)
+        merge_surrounding(final_result_set, model_output, w, h)
         print("+++++++++++reached here after merge surrounding++++++++++")
         print(final_result_set)
         # exit('++++++++++++======')
