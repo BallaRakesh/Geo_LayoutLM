@@ -136,13 +136,13 @@ def create_label_mappings(labels):
     return label2id, id2label
 
 # model_path = '/home/khushal/Desktop/data_n_models/Models/invoice_extraction/lmv2_aug_22/layoutLMV2ForTokenClassification_b4_final_best.pth'
-idp_inv_images_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Images"
-idp_inv_labels_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Labels"
-idp_inv_ocr_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/OCR"
-classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/class_names.txt"
-annot_classses_file= "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/label.txt" 
-idp_inv_json_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/final_results"
-idp_inv_image_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/reports"
+idp_inv_images_folder = "/datadrive/geo_data/grasim_test_samples/Images"
+idp_inv_labels_folder = "/datadrive/geo_data/grasim_test_samples/Labels"
+idp_inv_ocr_folder = "/datadrive/geo_data/grasim_test_samples/OCR"
+classes_path = "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/class_names_grasim.txt"
+annot_classses_file= "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/labels.txt" 
+idp_inv_json_results = "/datadrive/geo_data/grasim_test_samples/final_results"
+idp_inv_image_results = "/datadrive/geo_data/grasim_test_samples/reports"
 csv_file_path = './Inv_geo_OUTPUT_oct24'
 plot_gt_flag = False
 idp_model_type = "GEOlayoutLMVForTokenClassification"

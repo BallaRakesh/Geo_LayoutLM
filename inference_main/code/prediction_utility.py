@@ -377,6 +377,11 @@ def special_chr_check(bb_token, flag):
 		flag = False
 	return flag
 
+def check_vertical_distribution(bb1, bb2):
+	y1 = bb1[1]
+	y2 = bb2[1]
+	return abs(y1 - y2)
+
 
 def area(coordinates):
 	l = coordinates[2] - coordinates[0]
@@ -451,7 +456,17 @@ def merge_surrounding_old(data, model_output):
 			print("will continue")
 			continue
 
-
+def after_skipping(all_values, inx_ele_skip): 
+    # Add addition_val to the elements specified by inx_ele_skip
+    # for index in range(len(inx_ele_skip)):
+    #     inx_ele_skip[index] += addition_val 
+    # Delete elements specified by inx_ele_skip 
+    final_all_values = {}
+    for idx, value in all_values.items():
+        if idx not in inx_ele_skip:
+            final_all_values[idx] = value
+    # all_values = [value for idx, value in enumerate(all_values) if idx not in inx_ele_skip]
+    return final_all_values
 
 import copy
 def merge_by_skipping_running(model_output, w, h, key, all_values):
@@ -836,7 +851,10 @@ def merge_surrounding(data, model_output, w, h):
 						box = [x_left, y_top, x_right, y_bottom]
 						text = model_output_sum(key, box, model_output)
 						print("merged text is ", text)
-						avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+						try:
+							avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+						except:
+							avg_confs = 99.99
 						"""if "NA" in ocr_confs:
                             avg_ocr_confs = "NA"
                         else:
@@ -963,251 +981,265 @@ def lookup(
 
 #result_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results'
 def result_generation(img_path, token_data):
-    # input_path= "/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial"
-    # file_path= os.path.join(input_path,'Results/annotations')
-    # result_path = os.path.join(input_path, "Results_CS_validated")
-    # if not os.path.exists(result_path):
-    #         os.mkdir(result_path)
-    # img_path= os.path.join(input_path, "Results/images")
-    # image_list= os.listdir(file_path)
-    # image_list=  [ image.split('_tagging.json')[0] for image in image_list if image.endswith(".json")]
-    # # image_list= 
-    # print(image_list)
-    
-    number_of_colors = 80
-    color = ["#" + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
-    # exit('+++++++++++++++++++')
-    count=0
-    # for file in image_list:
-    file = os.path.splitext(os.path.basename(img_path))[0]
-    count+=1
-    im = Image.open(img_path)
-    for i, image in enumerate(ImageSequence.Iterator(im)):
-        w, h = image.size
-        temp = image.convert("L")
-        image_data = np.asarray(temp)
-        image = cv2.cvtColor(image_data, cv2.COLOR_GRAY2RGB)
-        
-        # plt.imshow(image)
-        # plt.show()
-        # plt.close()
-        arr = transform(image)
-        
-        # try:
-        #     with open(result_json) as f:
-        #         token_data = json.load(f)['form']
-        # except Exception as e:
-        #     with open(result_json) as f:
-        #         token_data = json.load(f)
-        predicted_keys = [token["pred_key"] for token in token_data if not token["pred_key"]=='O']
-        labels= [token.split('-')[1]for token in predicted_keys]
-        labels= set(labels)
-        label2color = {}
-        for i, l in enumerate(labels):
-            label2color[l] = color[i]
-        font = ImageFont.truetype(arial_file, 20)
-        # Extract predicted keys and corresponding coordinates
-        coordinates = [token["coords"] for token in token_data if not token["pred_key"]=='O']
-        new_img = transform2(arr)
-        # new_img.show()
-        # exit('++++++++====')
-        draw = ImageDraw.Draw(new_img)
-        # print(len(predicted_keys))
-        # print(predicted_keys)
-        # print(len(coordinates))
-        # print(token_data)
-        # exit('+++++++++++++++++++')
-        result_set = {}
-        for i in range(len(token_data)):
-                if token_data[i]["pred_key"]!= 'O':
-                    if (token_data[i]['pred_key']).split('-')[1] not in list(result_set.keys()):
-                        result_set[(token_data[i]['pred_key']).split('-')[1]] = []
-                    result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords']])
-        print(result_set)
-        model_output = result_set.copy()
-        with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
-            json.dump(result_set, f)
-        f.close()
-        
-        final_result_set = {}
-        
-        for k in list(result_set.keys()):
-            if k not in single_text_labels:
-                try:
-                    alpha = float(config[k]['ALPHA'])
-                except:
-                    alpha = float(config['Default']['ALPHA'])
-                if len(result_set[k]) > 1:
-                    print("++++++++++++++entry in this block+++++++++++")
-                    texts = [x[0] for x in result_set[k]]
-                    bboxes = [x[1] for x in result_set[k]]
-                    confs = [x[2] for x in result_set[k]]
-                    avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
-                    avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
-                    eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
-                    # if eps<=0.0:
-                    # 	eps=0.1
-                    clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
-                    label_set = set(clustering.labels_)
-                    for l in label_set:
-                        selected = list(np.where(clustering.labels_ == l)[0])
-                        selected_texts = [x for i, x in enumerate(texts) if i in selected]
-                        selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
-                        selected_confs = [x for i, x in enumerate(confs) if i in selected]
-                        text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
-                        text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
-                        text_boxes = validate_contour_sort(text_boxes)
-                        text_result = ""
-                        print(k)
-                        print(text_boxes)
-                        for tb in text_boxes:
-                            if text_result == "":
-                                text_result += tb[0]
-                            else:
-                                text_result += " " + tb[0]
-                        print(text_result)
-                        x1 = min([x[0] for x in selected_boxes])
-                        x2 = max([x[2] for x in selected_boxes])
-                        y1 = min([x[1] for x in selected_boxes])
-                        y2 = max([x[3] for x in selected_boxes])
-                        box_result = [x1, y1, x2, y2]
-                        conf_result = float(np.round(np.mean(selected_confs), 2))
-                        # print(box_result)
-                        if k not in list(final_result_set.keys()):
-                            final_result_set[k] = []
-                        final_result_set[k].append([text_result, box_result, conf_result])
+	# input_path= "/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial"
+	# file_path= os.path.join(input_path,'Results/annotations')
+	# result_path = os.path.join(input_path, "Results_CS_validated")
+	# if not os.path.exists(result_path):
+	#         os.mkdir(result_path)
+	# img_path= os.path.join(input_path, "Results/images")
+	# image_list= os.listdir(file_path)
+	# image_list=  [ image.split('_tagging.json')[0] for image in image_list if image.endswith(".json")]
+	# # image_list= 
+	# print(image_list)
 
-                else:
-                    if k not in list(final_result_set.keys()):
-                        final_result_set[k] = []
-                    final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
-            else:
-                if len(result_set[k]) > 1:
-                    print("++++++++++++++entry in this block+++++++++++")
-                    texts = [x[0] for x in result_set[k]]
-                    bboxes = [x[1] for x in result_set[k]]
-                    confs = [x[2] for x in result_set[k]]
-                    for i, value in enumerate(zip(texts, bboxes, confs)):
-                        print(list(value))
-                        if k not in list(final_result_set.keys()):
-                            final_result_set[k] = []
-                        final_result_set[k].append(list(value))
-                else:
-                    if k not in list(final_result_set.keys()):
-                        final_result_set[k] = []
-                    final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+	number_of_colors = 80
+	color = ["#" + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
+	# exit('+++++++++++++++++++')
+	count=0
+	# for file in image_list:
+	file = os.path.splitext(os.path.basename(img_path))[0]
+	count+=1
+	im = Image.open(img_path)
+	for i, image in enumerate(ImageSequence.Iterator(im)):
+		w, h = image.size
+		temp = image.convert("L")
+		image_data = np.asarray(temp)
+		image = cv2.cvtColor(image_data, cv2.COLOR_GRAY2RGB)
+		
+		# plt.imshow(image)
+		# plt.show()
+		# plt.close()
+		arr = transform(image)
+		
+		# try:
+		#     with open(result_json) as f:
+		#         token_data = json.load(f)['form']
+		# except Exception as e:
+		#     with open(result_json) as f:
+		#         token_data = json.load(f)
+		predicted_keys = [token["pred_key"] for token in token_data if not token["pred_key"]=='O']
+		labels= [token.split('-')[1]for token in predicted_keys]
+		labels= set(labels)
+		label2color = {}
+		for i, l in enumerate(labels):
+			label2color[l] = color[i]
+		font = ImageFont.truetype(arial_file, 20)
+		# Extract predicted keys and corresponding coordinates
+		coordinates = [token["coords"] for token in token_data if not token["pred_key"]=='O']
+		new_img = transform2(arr)
+		# new_img.show()
+		# exit('++++++++====')
+		draw = ImageDraw.Draw(new_img)
+		# print(len(predicted_keys))
+		# print(predicted_keys)
+		# print(len(coordinates))
+		# print(token_data)
+		# exit('+++++++++++++++++++')
+		result_set = {}
+		for i in range(len(token_data)):
+				if token_data[i]["pred_key"]!= 'O':
+					if (token_data[i]['pred_key']).split('-')[1] not in list(result_set.keys()):
+						result_set[(token_data[i]['pred_key']).split('-')[1]] = []
+					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords']])
+		print(result_set)
+		model_output = result_set.copy()
+		with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
+			json.dump(result_set, f)
+		f.close()
+		
+		final_result_set = {}
+		
+		for k in list(result_set.keys()):
+			if k not in single_text_labels:
+				try:
+					alpha = float(config[k]['ALPHA'])
+				except:
+					alpha = float(config['Default']['ALPHA'])
+				if len(result_set[k]) > 1:
+					print("++++++++++++++entry in this block+++++++++++")
+					texts = [x[0] for x in result_set[k]]
+					bboxes = [x[1] for x in result_set[k]]
+					try:
+						confs = [x[2] for x in result_set[k]]
+					except:
+						confs = [99.99 for x in result_set[k]]
+					avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
+					avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
+					eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
+					# if eps<=0.0:
+					# 	eps=0.1
+					clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
+					label_set = set(clustering.labels_)
+					for l in label_set:
+						selected = list(np.where(clustering.labels_ == l)[0])
+						selected_texts = [x for i, x in enumerate(texts) if i in selected]
+						selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
+						selected_confs = [x for i, x in enumerate(confs) if i in selected]
+						text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
+						text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
+						text_boxes = validate_contour_sort(text_boxes)
+						text_result = ""
+						print(k)
+						print(text_boxes)
+						for tb in text_boxes:
+							if text_result == "":
+								text_result += tb[0]
+							else:
+								text_result += " " + tb[0]
+						print(text_result)
+						x1 = min([x[0] for x in selected_boxes])
+						x2 = max([x[2] for x in selected_boxes])
+						y1 = min([x[1] for x in selected_boxes])
+						y2 = max([x[3] for x in selected_boxes])
+						box_result = [x1, y1, x2, y2]
+						conf_result = float(np.round(np.mean(selected_confs), 2))
+						# print(box_result)
+						if k not in list(final_result_set.keys()):
+							final_result_set[k] = []
+						final_result_set[k].append([text_result, box_result, conf_result])
+
+				else:
+					if k not in list(final_result_set.keys()):
+						final_result_set[k] = []
+					try:
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+					except:
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 99.99])
+         
+			else:
+				if len(result_set[k]) > 1:
+					print("++++++++++++++entry in this block+++++++++++")
+					texts = [x[0] for x in result_set[k]]
+					bboxes = [x[1] for x in result_set[k]]
+					try:
+						confs = [x[2] for x in result_set[k]]
+					except:
+						confs = [99.99 for x in result_set[k]]
+					for i, value in enumerate(zip(texts, bboxes, confs)):
+						print(list(value))
+						if k not in list(final_result_set.keys()):
+							final_result_set[k] = []
+						final_result_set[k].append(list(value))
+				else:
+					if k not in list(final_result_set.keys()):
+						final_result_set[k] = []
+					try:
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+					except:
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 99.99])
+					
 
 
-        
-        
-        '''
-        for k in list(result_set.keys()):
-            try:
-                alpha = float(config[k]['ALPHA'])
-            except:
-                alpha = float(config['Default']['ALPHA'])
-            if len(result_set[k]) > 1:
-                print("++++++++++++++entry in this block+++++++++++")
-                texts = [x[0] for x in result_set[k]]
-                bboxes = [x[1] for x in result_set[k]]
-                # confs = [x[2] for x in result_set[k]]
-                avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
-                avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
-                eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
-                if eps<=0.0:
-                    eps=0.1
-                clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
-                label_set = set(clustering.labels_)
-                for l in label_set:
-                    selected = list(np.where(clustering.labels_ == l)[0])
-                    selected_texts = [x for i, x in enumerate(texts) if i in selected]
-                    selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
-                    # selected_confs = [x for i, x in enumerate(confs) if i in selected]
-                    text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
-                    text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
-                    text_result = ""
+		
+		
+		'''
+		for k in list(result_set.keys()):
+			try:
+				alpha = float(config[k]['ALPHA'])
+			except:
+				alpha = float(config['Default']['ALPHA'])
+			if len(result_set[k]) > 1:
+				print("++++++++++++++entry in this block+++++++++++")
+				texts = [x[0] for x in result_set[k]]
+				bboxes = [x[1] for x in result_set[k]]
+				# confs = [x[2] for x in result_set[k]]
+				avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
+				avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
+				eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
+				if eps<=0.0:
+					eps=0.1
+				clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
+				label_set = set(clustering.labels_)
+				for l in label_set:
+					selected = list(np.where(clustering.labels_ == l)[0])
+					selected_texts = [x for i, x in enumerate(texts) if i in selected]
+					selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
+					# selected_confs = [x for i, x in enumerate(confs) if i in selected]
+					text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
+					text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
+					text_result = ""
 
-                    for tb in text_boxes:
-                        if text_result == "":
-                            text_result += tb[0]
-                        else:
-                            text_result += " " + tb[0]
-                    # print(text_result)
-                    x1 = min([x[0] for x in selected_boxes])
-                    x2 = max([x[2] for x in selected_boxes])
-                    y1 = min([x[1] for x in selected_boxes])
-                    y2 = max([x[3] for x in selected_boxes])
-                    box_result = [x1, y1, x2, y2]
-                    # conf_result = float(np.round(np.mean(selected_confs), 2))
-                    # print(box_result)
-                    if k not in list(final_result_set.keys()):
-                        final_result_set[k] = []
-                    final_result_set[k].append([text_result, box_result])
-            else:
-                if k not in list(final_result_set.keys()):
-                    final_result_set[k] = []
-                final_result_set[k].append([result_set[k][0][0],result_set[k][0][1]])  
-                '''
-                
-                
-        print(final_result_set)
-        merge_surrounding(final_result_set, model_output, w, h)
-        print("+++++++++++reached here after merge surrounding++++++++++")
-        print(final_result_set)
-        # exit('++++++++++++======')
-        for k in list(final_result_set.keys()):
-            all_values = final_result_set[k]
-            print(all_values)
-            # exit('________________')
-            for value in all_values:
-                draw.rectangle(value[1], outline=label2color[k], width=2)
-                draw.text((value[1][0] + 5, value[1][1] - 20),
-                            text=k , fill=label2color[k], font=font)
-        lookup_result = {}
-        # t_page_end = datetime.now()
-        # print("Time taken for page" + str(count) + ":", end=" ")
-        # print(t_page_end - t_page_start)
-        # print()
-        # all_page_result["Page Number " + str(count)] = final_result_set
-        # print(all_page_result)
-        for k in list(final_result_set.keys()):
-            if k in ["applicant_country", "beneficiary_country"]:
-                for val in final_result_set[k]:
-                    result_country = lookup(val[0], 4, 90, "countries.txt", result_set, k)
-                    result_company = lookup(val[0], 4, 90, "organization.txt", result_set, k)
-                    # print(val)
-                    # print(result)
-                    # replacing ocr result with correct result
-                    for res in result_company:
-                        found = res['found_string']
-                        searched = res['searched_string']
-                        new_val = val[0].replace(searched, found)
-                        val[0] = new_val
-                    # replacing ocr result with correct result
-                    for res in result_country:
-                        found = res['found_string']
-                        searched = res['searched_string']
-                        new_val = val[0].replace(searched, found)
-                        val[0] = new_val
-                    for res in result_country:
-                        if (str(k) + "-country") not in lookup_result:
-                            lookup_result[('LUT_' + str(k) + "-country")] = []
-                        lookup_result[('LUT_' + str(k) + "-country")].append(
-                            (res['found_string'], res['string_match_value'], res["bbox"]))
-                    for res in result_company:
-                        if (str(k) + "-organization") not in lookup_result:
-                            lookup_result[('LUT_' + str(k) + "-organization")] = []
-                        lookup_result[('LUT_' + str(k) + "-organization")].append(
-                            (res['found_string'], res['string_match_value'], res["bbox"]))
-        # print(lookup_result)
-        with open(os.path.join(result_path, file+ "_lookup.txt"), "w") as f:
-            json.dump(lookup_result, f)
-        print(f'final set : ++++++++++++++++++++++++++++++++++++++++++++')
-        print(final_result_set)
-        print(file)
-        # exit('++++++++++++++++')
-        with open(os.path.join(result_path, file + ".txt"), "w") as f:
-            json.dump(final_result_set, f)
-        new_img.save(os.path.join(result_path, file + ".png"))
-        
-    return final_result_set
+					for tb in text_boxes:
+						if text_result == "":
+							text_result += tb[0]
+						else:
+							text_result += " " + tb[0]
+					# print(text_result)
+					x1 = min([x[0] for x in selected_boxes])
+					x2 = max([x[2] for x in selected_boxes])
+					y1 = min([x[1] for x in selected_boxes])
+					y2 = max([x[3] for x in selected_boxes])
+					box_result = [x1, y1, x2, y2]
+					# conf_result = float(np.round(np.mean(selected_confs), 2))
+					# print(box_result)
+					if k not in list(final_result_set.keys()):
+						final_result_set[k] = []
+					final_result_set[k].append([text_result, box_result])
+			else:
+				if k not in list(final_result_set.keys()):
+					final_result_set[k] = []
+				final_result_set[k].append([result_set[k][0][0],result_set[k][0][1]])  
+				'''
+				
+				
+		print(final_result_set)
+		merge_surrounding(final_result_set, model_output, w, h)
+		print("+++++++++++reached here after merge surrounding++++++++++")
+		print(final_result_set)
+		# exit('++++++++++++======')
+		for k in list(final_result_set.keys()):
+			all_values = final_result_set[k]
+			print(all_values)
+			# exit('________________')
+			for value in all_values:
+				draw.rectangle(value[1], outline=label2color[k], width=2)
+				draw.text((value[1][0] + 5, value[1][1] - 20),
+							text=k , fill=label2color[k], font=font)
+		lookup_result = {}
+		# t_page_end = datetime.now()
+		# print("Time taken for page" + str(count) + ":", end=" ")
+		# print(t_page_end - t_page_start)
+		# print()
+		# all_page_result["Page Number " + str(count)] = final_result_set
+		# print(all_page_result)
+		for k in list(final_result_set.keys()):
+			if k in ["applicant_country", "beneficiary_country"]:
+				for val in final_result_set[k]:
+					result_country = lookup(val[0], 4, 90, "countries.txt", result_set, k)
+					result_company = lookup(val[0], 4, 90, "organization.txt", result_set, k)
+					# print(val)
+					# print(result)
+					# replacing ocr result with correct result
+					for res in result_company:
+						found = res['found_string']
+						searched = res['searched_string']
+						new_val = val[0].replace(searched, found)
+						val[0] = new_val
+					# replacing ocr result with correct result
+					for res in result_country:
+						found = res['found_string']
+						searched = res['searched_string']
+						new_val = val[0].replace(searched, found)
+						val[0] = new_val
+					for res in result_country:
+						if (str(k) + "-country") not in lookup_result:
+							lookup_result[('LUT_' + str(k) + "-country")] = []
+						lookup_result[('LUT_' + str(k) + "-country")].append(
+							(res['found_string'], res['string_match_value'], res["bbox"]))
+					for res in result_company:
+						if (str(k) + "-organization") not in lookup_result:
+							lookup_result[('LUT_' + str(k) + "-organization")] = []
+						lookup_result[('LUT_' + str(k) + "-organization")].append(
+							(res['found_string'], res['string_match_value'], res["bbox"]))
+		# print(lookup_result)
+		with open(os.path.join(result_path, file+ "_lookup.txt"), "w") as f:
+			json.dump(lookup_result, f)
+		print(f'final set : ++++++++++++++++++++++++++++++++++++++++++++')
+		print(final_result_set)
+		print(file)
+		# exit('++++++++++++++++')
+		with open(os.path.join(result_path, file + ".txt"), "w") as f:
+			json.dump(final_result_set, f)
+		new_img.save(os.path.join(result_path, file + ".png"))
+		
+	return final_result_set

@@ -32,7 +32,7 @@ def process_files_in_folder(input_folder, output_folder):
 
     # Iterate over all files in the input folder
     for filename in os.listdir(input_folder):
-        if filename.endswith('.txt') and 'lookup' not in filename:  # Process only .txt files
+        if filename.endswith('.txt') and 'lookup' not in filename and 'model_output' not in filename:  # Process only .txt files
             print('filename: %s' % filename)
             input_file_path = os.path.join(input_folder, filename)
             output_file_path = os.path.join(output_folder, filename.replace('.txt', '.json'))
@@ -53,8 +53,9 @@ def process_files_in_folder(input_folder, output_folder):
 
 # Main function to specify input/output folders
 def main():
-    input_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/results'
-    output_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/final_results'
+    input_folder = '/datadrive/geo_data/grasim_test_samples/results'
+    output_folder = '/datadrive/geo_data/grasim_test_samples/final_results'
+    os.makedirs(output_folder, exist_ok=True)
     process_files_in_folder(input_folder, output_folder)
 
 if __name__ == '__main__':

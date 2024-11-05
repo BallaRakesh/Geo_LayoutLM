@@ -2,10 +2,10 @@
 # The checkpoint file location to be saved: {workspace}/checkpoints/
 # The log file location to be saved: {workspace}/tensorboard_logs/
 # workspace: /media/ntlpt19/5250315B5031474F/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/custom_trial
-workspace: /media/ntlpt19/5250315B5031474F/ingram_rakesh_data/Model
+workspace: /datadrive/rakesh/eval_data
 
 dataset: custom
-dataset_root_path: /media/ntlpt19/5250315B5031474F/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset
+dataset_root_path: /datadrive/rakesh/eval_data
 task: ee_el
 img_h: 768
 img_w: 768

@@ -1,5 +1,5 @@
 gv_key_path = "/home/ntlpt19/Desktop/TF_release/intelligent_TF_Branch_ui_issues/TradeFinance/google_vision_key.json"
-arial_file = "/home/ntlpt19/Downloads/LAYOUT_LMV3_TESTING_STAGE1/extraction/arial.ttf"
+arial_file = "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/arial.ttf"
 
 
 vertical_merge_labels = [
@@ -26,7 +26,8 @@ vertical_merge_labels = [
 		"agent_name","notify_party_name","consignee_name","shipper_name","drawer_bank_name","drawee_bank_name",\
 		"freight_collect_or_prepaid","signed_by_carrier", "drawer_name",\
 		"tenore_details", "signed_By_agent", "signed_by_agent", "subject_matter_insured",\
-		"diclaration_by", "payment_terms_terms_of_delivery_payment", "bill_to", "ship_to", "remit_to", "invoice_total_in_words"
+		"diclaration_by", "payment_terms_terms_of_delivery_payment", "bill_to", "ship_to", "remit_to", "vendor_name",\
+		"invoice_total_in_words"
 			]
 
 # will not use DBScan with these tokens
@@ -132,7 +133,6 @@ single_text_labels = [
 	"im_vat_no",
 	"tax_percent",
 	"vat_code",
-	"vendor_name",
 	"vendor_vat_no",
 	"gstin",
 	"pan_number",
