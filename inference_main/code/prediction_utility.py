@@ -583,6 +583,7 @@ def merge_by_skipping_running(model_output, w, h, key, all_values):
 					text = model_output_sum(key, box, model_output)
 					print("merged text is ", text)
 					avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+					avg_confs = float(np.round(avg_confs, 6))
 					new_value = [text, box, avg_confs]
 					print(new_value)
 					print(all_values)
@@ -784,6 +785,7 @@ def merge_surrounding(data, model_output, w, h):
 								text = model_output_sum(key, box, model_output)
 								print("merged text is ", text)
 								avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+								avg_confs = float(np.round(avg_confs, 6))
 								new_value = [text, box, avg_confs]
 								print(new_value)
 								all_values.remove(all_values[i])
@@ -853,12 +855,14 @@ def merge_surrounding(data, model_output, w, h):
 						print("merged text is ", text)
 						# try:
 						avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+      
 						# except:
 						# 	avg_confs = 99.99
 						"""if "NA" in ocr_confs:
                             avg_ocr_confs = "NA"
                         else:
                             avg_ocr_confs = ( ocr_confs[0]* area(bb1) + ocr_confs[1]*area(bb2) )/(area(bb1) + area(bb2))"""
+						avg_confs = float(np.round(avg_confs, 6))
 						new_value = [text, box, avg_confs]
 						print(new_value)
 						all_values.remove(all_values[i])
@@ -992,6 +996,12 @@ def result_generation(img_path, token_data):
 	# # image_list= 
 	# print(image_list)
 
+	# Open the file in write mode and save the text
+ 
+	# with open('token_data.txt', 'w') as file:
+	# 	file.write(str(token_data))
+	# exit('OKKKKKK')
+ 
 	number_of_colors = 80
 	color = ["#" + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in range(number_of_colors)]
 	# exit('+++++++++++++++++++')
@@ -1040,7 +1050,7 @@ def result_generation(img_path, token_data):
 				if token_data[i]["pred_key"]!= 'O':
 					if (token_data[i]['pred_key']).split('-')[1] not in list(result_set.keys()):
 						result_set[(token_data[i]['pred_key']).split('-')[1]] = []
-					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords'], token_data[i]['confidence']])
+					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords'], float(np.round(token_data[i].get('confidence', 0.00), 6))])
 		print(result_set)
 		model_output = result_set.copy()
 		with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
@@ -1104,7 +1114,7 @@ def result_generation(img_path, token_data):
 						y1 = min([x[1] for x in selected_boxes])
 						y2 = max([x[3] for x in selected_boxes])
 						box_result = [x1, y1, x2, y2]
-						conf_result = float(np.round(np.mean(selected_confs), 5))
+						conf_result = float(np.round(np.mean(selected_confs), 6))
 						# print(box_result)
 						if k not in list(final_result_set.keys()):
 							final_result_set[k] = []
@@ -1124,7 +1134,7 @@ def result_generation(img_path, token_data):
 					texts = [x[0] for x in result_set[k]]
 					bboxes = [x[1] for x in result_set[k]]
 					try:
-						confs = [x[2] for x in result_set[k]]
+						confs = [float(np.round(x[2], 6)) for x in result_set[k]]
 					except:
 						confs = [0.00 for x in result_set[k]]
 					for i, value in enumerate(zip(texts, bboxes, confs)):
@@ -1136,7 +1146,8 @@ def result_generation(img_path, token_data):
 					if k not in list(final_result_set.keys()):
 						final_result_set[k] = []
 					try:
-						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+						# final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], float(np.round(result_set[k][0][2], 6))])
 					except:
 						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 0.00])
 					

@@ -1,5 +1,5 @@
-gv_key_path = "/home/ntlpt19/Desktop/TF_release/intelligent_TF_Branch_ui_issues/TradeFinance/google_vision_key.json"
-arial_file = "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/arial.ttf"
+gv_key_path = "./google_vision_key.json"
+arial_file = "./arial.ttf"
 
 
 vertical_merge_labels = [
