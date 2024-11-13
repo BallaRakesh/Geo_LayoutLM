@@ -27,7 +27,8 @@ vertical_merge_labels = [
 		"freight_collect_or_prepaid","signed_by_carrier", "drawer_name",\
 		"tenore_details", "signed_By_agent", "signed_by_agent", "subject_matter_insured",\
 		"diclaration_by", "payment_terms_terms_of_delivery_payment", "bill_to", "ship_to", "remit_to", "vendor_name",\
-		"invoice_total_in_words"
+		"invoice_total_in_words",\
+		"invoice_number","vendor_name","bill_to","ship_to","remit_to","ship_date"
 			]
 
 # will not use DBScan with these tokens
@@ -72,7 +73,7 @@ single_text_labels = [
 	"gross_weight",
 	"net_weight",
 	"good_marks",
-	"invoice_number",
+	# "invoice_number",
 	"invoice_date",
 	"lc_no",
 	"lc_date",
@@ -99,7 +100,7 @@ single_text_labels = [
 	"gross_weight",
 	"net_weight",
 	"good_marks",
-	"invoice_number",
+	# "invoice_number",
 	"invoice_date",
 	"lc_no",
 	"lc_date",
@@ -113,7 +114,7 @@ single_text_labels = [
 	"port_of_loading",
 	"container_number",
 	"country_of_final_destination",
-	"invoice_number",
+	# "invoice_number",
 	"invoice_date",
 	"customer_no",
 	"invoice_total",
@@ -123,7 +124,6 @@ single_text_labels = [
 	"order_date",
 	"due_date",
 	"page_number",
-	"ship_date",
 	"account_number",
 	"swift_code",
 	"purchase_order_number",
@@ -136,6 +136,31 @@ single_text_labels = [
 	"vendor_vat_no",
 	"gstin",
 	"pan_number",
+	"amount",
+	"net_amount",
+	"tax_amount",
+	"taxable_amount",
+	"freight_amount",
+	"delivery_challan_no",
+ 	"invoice_date",
+	"customer_no",
+	"invoice_total",
+	"sales_order_number",
+	"order_number",
+	"customer_order_number",
+	"order_date",
+	"due_date",
+	"page_number",
+	"account_number",
+	"swift_code",
+	"purchase_order_number",
+	"cash_discount",
+	"charge_type",
+	"doc_curr",
+	"im_vat_no",
+	"tax_percent",
+	"vat_code",
+	"vendor_vat_no"
 	"amount",
 	"net_amount",
 	"tax_amount",

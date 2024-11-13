@@ -30,6 +30,7 @@ from tqdm import tqdm
 from PIL import Image, ImageDraw
 import shutil
 from typing import Dict, List
+import torch.nn.functional as F
 
 from glob import glob
 
@@ -41,7 +42,7 @@ from typing import Dict
 from prediction_utility import result_generation
 
 from result_utility import get_eval_kwargs_geolayoutlm_vie, getitem_geo
-from prediction_utility import result_generation
+# from prediction_utility import result_generation
 from pre_process_utility import main, gv_data
 
 from fastapi.responses import JSONResponse
@@ -68,7 +69,10 @@ img_path = config['PATH']['DATA']
 
 
 def load_model_weight(net, pretrained_model_file):
+    #grasim
     pretrained_model_file = '/datadrive/geo_data/root/results/custom_trial/checkpoints/epoch=8-f1_labeling=0.9643.pt'
+    #ingram
+    # pretrained_model_file = '/datadrive/rakesh/epoch=10-f1_labeling=0.9647.pt'
     print("Loading ckpt from:", pretrained_model_file)
     print("HERE")
     pretrained_model_state_dict = torch.load(pretrained_model_file, map_location="cpu")
@@ -388,7 +392,7 @@ def get_geo_result_final(image_base64, file_name, OCR_path):
 
 
 
-    final_results = []
+    geo_final_results = []
     for data_ in pre_data1:
         print('>>>>>>>>>>>>>>>>>>')
         print('>>>>>>>>>>>>>>>>>>')
@@ -398,13 +402,10 @@ def get_geo_result_final(image_base64, file_name, OCR_path):
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
-        print('>>>>>>>>>>>>>>>>')
-        print('>>>>>>>>>>>>>>>>')
-        print('>>>>>>>>>>>>>>>>')
-        print()
-        final_results.extend(geo_results[0])
-    print(final_results)
-    geo_final_result = result_generation(img_path, final_results)
+
+        geo_final_results.extend(geo_results[0])
+    # exit('OKKKKKKKKKKKKKKKKKKKKKK')
+    geo_final_result = result_generation(img_path, geo_final_results)
     #result_generation('/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial__/vis/Invoice_405_28_s_1_linking.png', '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results/_tagging.json')
     # return JSONResponse(content=geo_final_result,status_code=200)
 

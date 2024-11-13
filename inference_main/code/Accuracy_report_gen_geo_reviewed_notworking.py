@@ -15,6 +15,20 @@ import traceback
 from fuzzywuzzy import fuzz
 import ast
 
+#  source /datadrive/khushal/idp39/bin/activate
+idp_inv_images_folder = "/datadrive/geo_data/grasim_test_samples/Images"
+idp_inv_labels_folder = "/datadrive/geo_data/grasim_test_samples/Labels"
+idp_inv_ocr_folder = "/datadrive/geo_data/grasim_test_samples/OCR"
+classes_path = "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/class_names_grasim.txt"
+annot_classses_file= "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/labels.txt" 
+idp_inv_json_results = "/datadrive/geo_data/grasim_test_samples/final_results"
+idp_inv_image_results = "/datadrive/geo_data/grasim_test_samples/reports"
+csv_file_path = './Inv_geo_OUTPUT_nov7'
+plot_gt_flag = False
+idp_model_type = "GEOlayoutLMVForTokenClassification"
+
+
+
 def save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz_pred_count, folder_name="geo_reports", filename="fuzzy_results.xlsx"):
     """
     Saves fuzzy matching results to an Excel file in a specified folder.
@@ -98,8 +112,6 @@ def save_overall_geo_report(total_actual_labels, total_pred_labels, fuzz25_corre
 
     print(f"Overall report successfully saved to {output_path}")
 
-
-
 def read_labels_from_file(file_path):
     """
     Reads a label.txt file and returns a list of labels.
@@ -136,16 +148,6 @@ def create_label_mappings(labels):
     return label2id, id2label
 
 # model_path = '/home/khushal/Desktop/data_n_models/Models/invoice_extraction/lmv2_aug_22/layoutLMV2ForTokenClassification_b4_final_best.pth'
-idp_inv_images_folder = "/datadrive/geo_data/grasim_test_samples/Images"
-idp_inv_labels_folder = "/datadrive/geo_data/grasim_test_samples/Labels"
-idp_inv_ocr_folder = "/datadrive/geo_data/grasim_test_samples/OCR"
-classes_path = "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/class_names_grasim.txt"
-annot_classses_file= "/home/gpu1admin/rakesh/Geo_LayoutLM/inference_main/code/labels.txt" 
-idp_inv_json_results = "/datadrive/geo_data/grasim_test_samples/final_results"
-idp_inv_image_results = "/datadrive/geo_data/grasim_test_samples/reports"
-csv_file_path = './Inv_geo_OUTPUT_nov7'
-plot_gt_flag = False
-idp_model_type = "GEOlayoutLMVForTokenClassification"
 
 # Get current directory of this script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -439,19 +441,15 @@ def detect(save_csv=False):
         # Run inference
         t0 = time.time()
         # counter=100
-        label_wise_fuzz75_pred_count = {} ; label_wise_fuzz100_pred_count = {} ; label_wise_fuzz85_pred_count={} ; label_wise_fuzz90_pred_count = {} ; label_wise_total_pred_count = {}
+        label_wise_fuzz75_pred_count = {} ; label_wise_fuzz100_pred_count = {} ; label_wise_fuzz85_pred_count={} ; label_wise_fuzz90_pred_count = {}; label_wise_fuzz100_pred_count = {} ; label_wise_total_pred_count = {}
         fuzz50_correct_preds = 0 ; fuzz25_correct_preds = 0 ; fuzz75_correct_preds = 0 ; fuzz85_correct_preds=0; fuzz90_correct_preds = 0 ; fuzz100_correct_preds = 0
         total_pred_labels = 0 ; total_actual_labels = 0
 
         for file in os.listdir(idp_inv_images_folder):
-            # if file not in "IM-000000010965506-AP_page_1.png":
+            # if file not in ["571581_Invoice_page_0.png"]: #["IM-000000010965506-AP_page_1.png"]:
             #     continue
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             print('file:', file)
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             
             img_path = os.path.join(idp_inv_images_folder, file)
@@ -494,7 +492,7 @@ def detect(save_csv=False):
             print("\n\nGot actual value : ", actual_value)
             total_actual_labels += len([x for inner_list in actual_value.values() for x in inner_list])
 
-            plot_boxes_on_image(img_path, pred, [x for inner_list in actual_value.values() for x in inner_list], idp_inv_image_results, file, plot_gt=plot_gt_flag)
+            # plot_boxes_on_image(img_path, pred, [x for inner_list in actual_value.values() for x in inner_list], idp_inv_image_results, file, plot_gt=plot_gt_flag)
             
             cls_to_delete = set()
             for xyxy, cls, cnf, idp_predicted_value in pred:
@@ -564,6 +562,10 @@ def detect(save_csv=False):
                     fuzz90_correct_preds += 1
                     if cls not in label_wise_fuzz90_pred_count.keys():label_wise_fuzz90_pred_count[cls] = 1
                     else:label_wise_fuzz90_pred_count[cls] += 1
+                if fuzzScore>=100: 
+                    fuzz90_correct_preds += 1
+                    if cls not in label_wise_fuzz100_pred_count.keys():label_wise_fuzz100_pred_count[cls] = 1
+                    else:label_wise_fuzz100_pred_count[cls] += 1
                 
                 if cls not in label_wise_total_pred_count.keys():label_wise_total_pred_count[cls] = 1
                 else:label_wise_total_pred_count[cls] += 1
@@ -618,6 +620,14 @@ def detect(save_csv=False):
                 print(f">> Label {l}\t:\t0 / {label_wise_total_pred_count[l]}\t= 0 %")
             else:
                 print(f">> Label {l}\t:\t{label_wise_fuzz75_pred_count[l]} / {label_wise_total_pred_count[l]}\t= {round(label_wise_fuzz75_pred_count[l]/label_wise_total_pred_count[l]*100,4)} %")
+        print("###################################################")
+        print("Label Wise Correct Predictions Percentage: (For Fuzzy percentage>=100)")
+        for l in label_wise_total_pred_count.keys():
+            if l not in label_wise_fuzz100_pred_count.keys():
+                print(f">> Label {l}\t:\t0 / {label_wise_total_pred_count[l]}\t= 0 %")
+            else:
+                print(f">> Label {l}\t:\t{label_wise_fuzz100_pred_count[l]} / {label_wise_total_pred_count[l]}\t= {round(label_wise_fuzz100_pred_count[l]/label_wise_total_pred_count[l]*100,4)} %")
+        
         if save_txt:
             print('Results saved to %s' % os.getcwd() + os.sep + out)
 

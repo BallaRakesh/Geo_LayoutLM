@@ -851,10 +851,10 @@ def merge_surrounding(data, model_output, w, h):
 						box = [x_left, y_top, x_right, y_bottom]
 						text = model_output_sum(key, box, model_output)
 						print("merged text is ", text)
-						try:
-							avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
-						except:
-							avg_confs = 99.99
+						# try:
+						avg_confs = (confs[0] * area(bb1) + confs[1] * area(bb2)) / (area(bb1) + area(bb2))
+						# except:
+						# 	avg_confs = 99.99
 						"""if "NA" in ocr_confs:
                             avg_ocr_confs = "NA"
                         else:
@@ -1040,7 +1040,7 @@ def result_generation(img_path, token_data):
 				if token_data[i]["pred_key"]!= 'O':
 					if (token_data[i]['pred_key']).split('-')[1] not in list(result_set.keys()):
 						result_set[(token_data[i]['pred_key']).split('-')[1]] = []
-					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords']])
+					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords'], token_data[i]['confidence']])
 		print(result_set)
 		model_output = result_set.copy()
 		with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
@@ -1062,7 +1062,7 @@ def result_generation(img_path, token_data):
 					try:
 						confs = [x[2] for x in result_set[k]]
 					except:
-						confs = [99.99 for x in result_set[k]]
+						confs = [0.00 for x in result_set[k]]
 					avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
 					avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
 					eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
@@ -1086,13 +1086,25 @@ def result_generation(img_path, token_data):
 								text_result += tb[0]
 							else:
 								text_result += " " + tb[0]
+      
+						# for i, tb in enumerate(text_boxes):
+						# 	text_token = tb[0]
+						# 	# Check if we need to add a space:
+						# 	# - Only if the previous character in text_result is alphanumeric
+						# 	# - Only if the current token doesn't start with a space
+						# 	if i > 0 and text_result[-1].isalnum() and text_token[0].isalnum() and not text_token.startswith(" "):
+						# 		text_result += " " + text_token
+						# 	else:
+						# 		text_result += text_token
+
+      
 						print(text_result)
 						x1 = min([x[0] for x in selected_boxes])
 						x2 = max([x[2] for x in selected_boxes])
 						y1 = min([x[1] for x in selected_boxes])
 						y2 = max([x[3] for x in selected_boxes])
 						box_result = [x1, y1, x2, y2]
-						conf_result = float(np.round(np.mean(selected_confs), 2))
+						conf_result = float(np.round(np.mean(selected_confs), 5))
 						# print(box_result)
 						if k not in list(final_result_set.keys()):
 							final_result_set[k] = []
@@ -1104,7 +1116,7 @@ def result_generation(img_path, token_data):
 					try:
 						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
 					except:
-						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 99.99])
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 0.00])
          
 			else:
 				if len(result_set[k]) > 1:
@@ -1114,7 +1126,7 @@ def result_generation(img_path, token_data):
 					try:
 						confs = [x[2] for x in result_set[k]]
 					except:
-						confs = [99.99 for x in result_set[k]]
+						confs = [0.00 for x in result_set[k]]
 					for i, value in enumerate(zip(texts, bboxes, confs)):
 						print(list(value))
 						if k not in list(final_result_set.keys()):
@@ -1126,7 +1138,7 @@ def result_generation(img_path, token_data):
 					try:
 						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], result_set[k][0][2]])
 					except:
-						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 99.99])
+						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 0.00])
 					
 
 
