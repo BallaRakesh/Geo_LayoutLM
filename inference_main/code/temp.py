@@ -1,5 +1,61 @@
+
+
 import os
 import shutil
+from fuzzywuzzy import fuzz
+
+
+
+
+from fuzzywuzzy import fuzz
+
+str1 = "a b a c"
+str2 = "a b c"
+
+similarity_score = fuzz.token_sort_ratio(str1, str2)
+print(similarity_score)  # This should also output a high score, typically 100, as it treats them as the same ordered set.
+
+
+
+
+import torch
+import torch.nn.functional as F
+
+# Example logits for classification
+logits = torch.tensor([[1.0, 2.0, 3.0], [1.5, 2.5, 3.5]])
+
+# Apply softmax along the last dimension (-1)
+probs = F.softmax(logits, dim=-1)
+
+print("Logits:", logits)
+print("Probabilities:", probs)
+
+# output a high score (e.g., 100), indicating a strong match.
+exit('OK')
+
+
+
+def clean_text(text):
+    # Remove leading and trailing '/', '-', or ':'
+    token_to_strip = "/-:._'^"
+    return text.strip(token_to_strip)
+
+value1 = 'V NDIA ENGINEERING ANDCONSTRUCTION PVT LTD wr 11 .I000-'
+value1 = 'to , grasim industries ltd binaga , karwar 581307 . -/'
+value2 = 'v ndia engineering andconstruction pvt ltd'
+value2 = 'To, GRASIM INDUSTRIES LTD BINAGA, KARWAR - 581307.'
+value1 = value1.replace(" ", "")
+value2 = value2.replace(" ", "")
+# if field_name in ['purchase_order_number', 'pan_number', 'vendor_name']:
+value1 = clean_text(value1)
+value2 = clean_text(value2)
+print('value1', value1)
+print('value2', value2)
+print(fuzz.ratio(value1, value2))
+print(fuzz.ratio(value2.lower(), value1.lower()))
+print(fuzz.ratio(value1.lower(), value2.lower()))
+exit('OK')
+
 
 def copy_images_to_folder(image_list, destination_folder,  root_data_img, root_data_anno):
     # Create the destination folder if it doesn't exist
@@ -35,11 +91,29 @@ def ocr_file_copy(image_list, destination_folder_ocr):
             print(f"Copied: {image_path}")
         else:
             print(f"File not found: {image_path}")
+from fuzzywuzzy import fuzz
 
 # Example usage:
 if __name__ == '__main__':
-    
-    
+    def clean_text(text):
+        # Remove leading and trailing '/', '-', or ':'
+        token_to_strip = "/-:"
+        return text.strip(token_to_strip)
+	
+    # Example texts
+    pred = "/ 54839"
+    actual = "54839"
+
+    # Cleaned results
+    cleaned_pred = clean_text(pred)
+    cleaned_actual = clean_text(actual)
+
+    print("Cleaned Pred:", cleaned_pred)
+    print("Cleaned Actual:", cleaned_actual)
+    print(fuzz.ratio(cleaned_pred.replace(" ", ""), cleaned_actual.replace(" ", ""))) # fuzz.partial_ratio(value1, value2)
+    print(fuzz.ratio(cleaned_pred, cleaned_actual)) # fuzz.partial_ratio(value1, value2)
+
+    exit('OK')
     def get_class_names(dataset_root_path):
         class_names_file = os.path.join(dataset_root_path)#, "class_names.txt")
         class_names = (

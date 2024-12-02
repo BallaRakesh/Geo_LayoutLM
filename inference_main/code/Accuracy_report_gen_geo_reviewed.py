@@ -15,6 +15,21 @@ import traceback
 from fuzzywuzzy import fuzz
 import ast
 
+#  source /datadrive/khushal/idp39/bin/activate
+idp_inv_images_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Images"
+idp_inv_labels_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Labels"
+idp_inv_ocr_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/OCR"
+classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/class_names.txt"
+annot_classses_file = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/label.txt" 
+idp_inv_json_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter3/final_results"
+idp_inv_image_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter2/reports__nov6"
+csv_file_path = './Inv_geo_OUTPUT_nov6__'
+plot_gt_flag = False
+idp_model_type = "GEOlayoutLMVForTokenClassification"
+
+
+
+
 def save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz_pred_count, folder_name="geo_reports", filename="fuzzy_results.xlsx"):
     """
     Saves fuzzy matching results to an Excel file in a specified folder.
@@ -98,8 +113,6 @@ def save_overall_geo_report(total_actual_labels, total_pred_labels, fuzz25_corre
 
     print(f"Overall report successfully saved to {output_path}")
 
-
-
 def read_labels_from_file(file_path):
     """
     Reads a label.txt file and returns a list of labels.
@@ -136,16 +149,6 @@ def create_label_mappings(labels):
     return label2id, id2label
 
 # model_path = '/home/khushal/Desktop/data_n_models/Models/invoice_extraction/lmv2_aug_22/layoutLMV2ForTokenClassification_b4_final_best.pth'
-idp_inv_images_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Images"
-idp_inv_labels_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Labels"
-idp_inv_ocr_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/OCR"
-classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/class_names.txt"
-annot_classses_file= "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/label.txt" 
-idp_inv_json_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/final_results"
-idp_inv_image_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/reports"
-csv_file_path = './Inv_geo_OUTPUT_nov9'
-plot_gt_flag = False
-idp_model_type = "GEOlayoutLMVForTokenClassification"
 
 # Get current directory of this script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -361,29 +364,6 @@ def standardize_date(date_str):
             pass
     return None
 
-def clean_text(text):
-    # Remove leading and trailing '/', '-', or ':'
-    token_to_strip = "/-:._'‘^"
-    return text.strip(token_to_strip)
-
-
-def remove_punctuation(text):
-    # Remove periods and colons
-    text = text.replace(".", "").replace(":", "")
-    return text
-
-def clean_text2(text):
-    # Remove periods and colons
-    text = text.replace(".", "").replace(":", "").replace(",", "").replace("/", "")
-    return text
-
-key_wise_percentenge = {
-    'ship_date': 98,
-    'ship_to': 98,
-    'bill_to': 98,
-    'remit_to': 98
-}
-
 def calculate_fuzzy_score(value1, value2, field_name):
     if pd.isna(value1) or pd.isna(value2):
         return 0
@@ -398,21 +378,9 @@ def calculate_fuzzy_score(value1, value2, field_name):
         value2 = str(value2.rstrip("sep").strip())
     else:
         pass
-    
-    
     value1 = value1.replace(" ", "")
     value2 = value2.replace(" ", "")
-    value1 = clean_text(value1)
-    value2 = clean_text(value2)
-    # if field_name in ['remit_to', 'bill_to', 'ship_to', 'ship_date']:
-    #     value1 = clean_text2(value1)
-    #     value2 = clean_text2(value2)
-    #     return fuzz.ratio(value1, value2)
-        
-    if field_name == 'doc_curr':
-        value1 = remove_punctuation(value1)
-        value2 = remove_punctuation(value2)
-        return fuzz.ratio(value1, value2)
+
     if 'date' in field_name.lower():
         standardized_date1 = standardize_date(value1)
         standardized_date2 = standardize_date(value2)
@@ -424,12 +392,6 @@ def calculate_fuzzy_score(value1, value2, field_name):
         value1 = preprocess_address(value1)
         value2 = preprocess_address(value2)
         return fuzz.ratio(value1, value2) # fuzz.partial_ratio(value1, value2)
-    
-    # elif field_name in key_wise_percentenge:
-    #     if fuzz.ratio(value1, value2) >= key_wise_percentenge[field_name]:
-    #         return 100
-    #     else:
-    #         return fuzz.ratio(value1, value2)
     else:
         return fuzz.ratio(value1, value2) # fuzz.partial_ratio(value1, value2) 
 
@@ -480,19 +442,15 @@ def detect(save_csv=False):
         # Run inference
         t0 = time.time()
         # counter=100
-        label_wise_fuzz75_pred_count = {} ; label_wise_fuzz100_pred_count = {} ; label_wise_fuzz85_pred_count={} ; label_wise_fuzz90_pred_count = {} ; label_wise_total_pred_count = {}
+        label_wise_fuzz75_pred_count = {} ; label_wise_fuzz100_pred_count = {} ; label_wise_fuzz85_pred_count={} ; label_wise_fuzz90_pred_count = {}; label_wise_fuzz100_pred_count = {} ; label_wise_total_pred_count = {}
         fuzz50_correct_preds = 0 ; fuzz25_correct_preds = 0 ; fuzz75_correct_preds = 0 ; fuzz85_correct_preds=0; fuzz90_correct_preds = 0 ; fuzz100_correct_preds = 0
         total_pred_labels = 0 ; total_actual_labels = 0
 
         for file in os.listdir(idp_inv_images_folder):
-            # if file not in "IM-000000010965506-AP_page_1.png":
-            #     continue
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+            if file not in ["571581_Invoice_page_0.png"]: #["IM-000000010965506-AP_page_1.png"]:
+                continue
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             print('file:', file)
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             
             img_path = os.path.join(idp_inv_images_folder, file)
@@ -566,7 +524,6 @@ def detect(save_csv=False):
 
                     # ['filename', 'field', 'actual_value', 'idp_predicted_value', 'fuzzy_score', 'box_predicted_value', 'confidence_score', 'bbox_actual', 'bbox_predicted', 'iou']
                     idp_pred = idp_predicted_value
-
                     fuzz_score = calculate_fuzzy_score(actual_value_str['words'], idp_pred, cls)
                     
                     prediction_list.append([file, cls, actual_value_str['words'], idp_predicted_value, fuzz_score, predicted_value, round(cnf,3), actual_value_str['bbox'], bbox_predicted, round(iou,2)])
@@ -606,6 +563,10 @@ def detect(save_csv=False):
                     fuzz90_correct_preds += 1
                     if cls not in label_wise_fuzz90_pred_count.keys():label_wise_fuzz90_pred_count[cls] = 1
                     else:label_wise_fuzz90_pred_count[cls] += 1
+                if fuzzScore>=100: 
+                    fuzz90_correct_preds += 1
+                    if cls not in label_wise_fuzz100_pred_count.keys():label_wise_fuzz100_pred_count[cls] = 1
+                    else:label_wise_fuzz100_pred_count[cls] += 1
                 
                 if cls not in label_wise_total_pred_count.keys():label_wise_total_pred_count[cls] = 1
                 else:label_wise_total_pred_count[cls] += 1
@@ -624,7 +585,7 @@ def detect(save_csv=False):
                 for actual_value_left_str in actual_box_left:
                     cls_ = anno_idx2label[class_id]
                     fuzzScore = 0 # calculate_fuzzy_score(actual_value_str['words'], "", cls_)
-                    csv_writer.writerow([file, cls_, actual_value_left_str['words'], "N/A", fuzzScore, "N/A", 0, actual_value_left_str['bbox'], "(0,0,0,0)", 0])
+                csv_writer.writerow([file, cls_, actual_value_left_str['words'], "N/A", fuzzScore, "N/A", 0, actual_value_left_str['bbox'], "(0,0,0,0)", 0])
         print("###################################################")
         print("No. of Actual Labels :", total_actual_labels)
         print("No. of Predictions   :", total_pred_labels)
@@ -660,6 +621,14 @@ def detect(save_csv=False):
                 print(f">> Label {l}\t:\t0 / {label_wise_total_pred_count[l]}\t= 0 %")
             else:
                 print(f">> Label {l}\t:\t{label_wise_fuzz75_pred_count[l]} / {label_wise_total_pred_count[l]}\t= {round(label_wise_fuzz75_pred_count[l]/label_wise_total_pred_count[l]*100,4)} %")
+        print("###################################################")
+        print("Label Wise Correct Predictions Percentage: (For Fuzzy percentage>=100)")
+        for l in label_wise_total_pred_count.keys():
+            if l not in label_wise_fuzz100_pred_count.keys():
+                print(f">> Label {l}\t:\t0 / {label_wise_total_pred_count[l]}\t= 0 %")
+            else:
+                print(f">> Label {l}\t:\t{label_wise_fuzz100_pred_count[l]} / {label_wise_total_pred_count[l]}\t= {round(label_wise_fuzz100_pred_count[l]/label_wise_total_pred_count[l]*100,4)} %")
+        
         if save_txt:
             print('Results saved to %s' % os.getcwd() + os.sep + out)
 

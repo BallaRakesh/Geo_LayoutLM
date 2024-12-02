@@ -14,6 +14,7 @@ from datetime import datetime
 import traceback
 from fuzzywuzzy import fuzz
 import ast
+import pandas as pd
 
 def save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz_pred_count, folder_name="geo_reports", filename="fuzzy_results.xlsx"):
     """
@@ -40,7 +41,8 @@ def save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz_pred_count, 
         data.append([label, predicted_count, actual_count, accuracy])
 
     # Convert the data into a DataFrame
-    df = pd.DataFrame(data, columns=["label", "predicted count", "actual count", "accuracy"])
+    # df = pd.DataFrame(data, columns=["label", "predicted count", "actual count", "accuracy"])
+    df = pd.DataFrame(data, columns=["label", "correct predicted count", "predicted count", "accuracy"])
 
     # Ensure the specified folder exists
     os.makedirs(folder_name, exist_ok=True)
@@ -372,6 +374,11 @@ def remove_punctuation(text):
     text = text.replace(".", "").replace(":", "")
     return text
 
+def remove_punctuation_address(text):
+    # Remove periods and colons
+    text = text.replace(".", "").replace(":", "").replace("'", "")
+    return text
+
 def clean_text2(text):
     # Remove periods and colons
     text = text.replace(".", "").replace(":", "").replace(",", "").replace("/", "")
@@ -384,10 +391,66 @@ key_wise_percentenge = {
     'remit_to': 98
 }
 
-def calculate_fuzzy_score(value1, value2, field_name):
+
+
+def get_fuzzy_scores(df_new, filename, field, actual_value, idp_predicted_value):
+    """
+    Look up fuzzy scores from a CSV file based on given parameters.
+    
+    Parameters:
+    csv_path (str): Path to the CSV file
+    filename (str): Name of the file to look up
+    field (str): Field name to match
+    actual_value (str): Actual value to match
+    idp_predicted_value (str): Predicted value to match
+    
+    Returns:
+    tuple: (fuzzy_score, updated_fuzzy_score) if found, (None, None) if not found
+    """
+    # try:
+    # Read the CSV file
+    # Convert all string columns to lowercase for case-insensitive matching
+    for col in ['filename', 'field', 'actual_value', 'idp_predicted_value']:
+        df_new[col] = df_new[col].str.lower()
+        
+    # Convert input parameters to lowercase
+    filename = filename.lower()
+    field = field.lower()
+    actual_value = actual_value.lower()
+    idp_predicted_value = idp_predicted_value.lower()
+    
+    # Find matching row
+    matching_row = df_new[
+        (df_new['filename'] == filename) &
+        (df_new['field'] == field) &
+        (df_new['actual_value'] == actual_value) &
+        (df_new['idp_predicted_value'] == idp_predicted_value)
+    ]
+    
+    if len(matching_row) == 0:
+        print(f"No matching record found for the given parameters.")
+        return None, None
+    
+    if len(matching_row) > 1:
+        print(f"Warning: Multiple matching records found. Returning the first match.")
+        
+    # Get the scores from the first matching row
+    fuzzy_score = matching_row.iloc[0]['fuzzy_score']
+    updated_fuzzy_score = matching_row.iloc[0]['updated_fuzzy_score']
+    
+    return fuzzy_score, updated_fuzzy_score
+    
+        
+        
+
+def calculate_fuzzy_score(value1, value2, field_name, file_name = None):
     if pd.isna(value1) or pd.isna(value2):
         return 0
-
+    # print('????????????????????????????????')
+    # print(value1)
+    # print(value2)
+    copied_value1 = value1
+    copied_value2 = value2
     # Standardize the values for comparison
     value1 = str(value1).strip().lower()
     value2 = str(value2).strip().lower()
@@ -399,16 +462,20 @@ def calculate_fuzzy_score(value1, value2, field_name):
     else:
         pass
     
-    
     value1 = value1.replace(" ", "")
     value2 = value2.replace(" ", "")
     value1 = clean_text(value1)
     value2 = clean_text(value2)
-    # if field_name in ['remit_to', 'bill_to', 'ship_to', 'ship_date']:
-    #     value1 = clean_text2(value1)
-    #     value2 = clean_text2(value2)
-    #     return fuzz.ratio(value1, value2)
-        
+    if field_name in ['remit_to', 'bill_to', 'ship_to', 'ship_date', 'invoice_total_in_words']:
+        value1 = remove_punctuation_address(value1)
+        value2 = remove_punctuation_address(value2)
+        act_score, corrected_score = get_fuzzy_scores(corrected_excel_df, file_name, field_name, copied_value1, copied_value2)
+        if act_score and corrected_score:
+            if corrected_score == act_score:
+                return fuzz.ratio(value1, value2)
+            return corrected_score   
+        else:
+            fuzz.ratio(value1, value2)
     if field_name == 'doc_curr':
         value1 = remove_punctuation(value1)
         value2 = remove_punctuation(value2)
@@ -432,6 +499,40 @@ def calculate_fuzzy_score(value1, value2, field_name):
     #         return fuzz.ratio(value1, value2)
     else:
         return fuzz.ratio(value1, value2) # fuzz.partial_ratio(value1, value2) 
+
+def update_actual_label_wise_count(data_, label_count_):
+    # Count occurrences of each label  
+    for items in data_.values():  
+        for item in items:  
+            label = item['class']  
+            if label in label_count_:  
+                label_count_[label] += 1  
+            else:  
+                label_count_[label] = 1
+    return label_count_
+
+
+def get_key_count(label_wise_total_pred_count, actual_label_wise_count, label_wise_fuzz100_pred_count, folder_name="geo_reports"):
+    # Gather all unique keys from all dictionaries  
+    all_keys = set(label_wise_total_pred_count.keys())  
+    all_keys.update(actual_label_wise_count.keys())  
+    all_keys.update(label_wise_fuzz100_pred_count.keys())  
+    # Prepare data for CSV  
+    csv_data = []  
+    header = ['Label', 'Actual Count', 'Total Predicted Count', 'Correct Predicted Count']  
+    csv_data.append(header)  
+    for key in sorted(all_keys):  # Sorting the keys for consistent order  
+        actual_count = actual_label_wise_count.get(key, '')  # Use '' if the key is missing  
+        total_predicted_count = label_wise_total_pred_count.get(key, '')  
+        correct_predicted_count = label_wise_fuzz100_pred_count.get(key, '')  
+        csv_data.append([key, actual_count, total_predicted_count, correct_predicted_count])  
+    csv_filename = 'label_counts.csv'  
+    os.makedirs(folder_name, exist_ok=True)
+    output_path = os.path.join(folder_name, csv_filename)
+    with open(output_path, mode='w', newline='') as file:  
+        writer = csv.writer(file)  
+        writer.writerows(csv_data)  
+    print(f'CSV file "{output_path}" has been created successfully.')
 
 def detect(save_csv=False):
     # imgsz = (320, 192) if ONNX_EXPORT else opt.img_size  # (320, 192) or (416, 256) or (608, 352) for (height, width)
@@ -482,7 +583,7 @@ def detect(save_csv=False):
         # counter=100
         label_wise_fuzz75_pred_count = {} ; label_wise_fuzz100_pred_count = {} ; label_wise_fuzz85_pred_count={} ; label_wise_fuzz90_pred_count = {} ; label_wise_total_pred_count = {}
         fuzz50_correct_preds = 0 ; fuzz25_correct_preds = 0 ; fuzz75_correct_preds = 0 ; fuzz85_correct_preds=0; fuzz90_correct_preds = 0 ; fuzz100_correct_preds = 0
-        total_pred_labels = 0 ; total_actual_labels = 0
+        total_pred_labels = 0 ; total_actual_labels = 0; actual_label_wise_count = {}
 
         for file in os.listdir(idp_inv_images_folder):
             # if file not in "IM-000000010965506-AP_page_1.png":
@@ -534,6 +635,9 @@ def detect(save_csv=False):
             actual_value = get_actual_value(ocr_data, label_data, img.shape[1], img.shape[0], anno_idx2label)  # Pass image dimensions
             print("\n\nGot actual value : ", actual_value)
             total_actual_labels += len([x for inner_list in actual_value.values() for x in inner_list])
+            print('##########################')
+            print('##########################')
+            actual_label_wise_count = update_actual_label_wise_count(actual_value, actual_label_wise_count)
 
             # plot_boxes_on_image(img_path, pred, [x for inner_list in actual_value.values() for x in inner_list], idp_inv_image_results, file, plot_gt=plot_gt_flag)
             
@@ -566,13 +670,15 @@ def detect(save_csv=False):
 
                     # ['filename', 'field', 'actual_value', 'idp_predicted_value', 'fuzzy_score', 'box_predicted_value', 'confidence_score', 'bbox_actual', 'bbox_predicted', 'iou']
                     idp_pred = idp_predicted_value
-
-                    fuzz_score = calculate_fuzzy_score(actual_value_str['words'], idp_pred, cls)
+                    fuzz_score = calculate_fuzzy_score(actual_value_str['words'], idp_pred, cls, file_name = file)
                     
                     prediction_list.append([file, cls, actual_value_str['words'], idp_predicted_value, fuzz_score, predicted_value, round(cnf,3), actual_value_str['bbox'], bbox_predicted, round(iou,2)])
 
                 final_pred = None ; max_fuzz = -1 ; max_iou = -1      
                 final_pred = [file, cls, "N/A", idp_predicted_value, "0", predicted_value, round(cnf,3), "(0,0,0,0)", bbox_predicted, "0"]
+                print('Before')
+                print(prediction_list)
+                print('-----------------------------------')
                 for pred in prediction_list:
                     if pred[-1] > max_iou:
                         final_pred = pred
@@ -613,6 +719,7 @@ def detect(save_csv=False):
                 # if fuzzScore >= 0:
                 csv_writer.writerow(final_pred)
             
+
             for cls,actual_word in cls_to_delete:
                 # print("Looking For : ", cls,actual_word)
                 for i, word_info in enumerate(actual_value[anno_label2idx[cls]]):
@@ -648,6 +755,7 @@ def detect(save_csv=False):
         save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz100_pred_count, folder_name="geo_reports", filename="fuzzy100_results.xlsx")
         save_fuzzy_results(label_wise_total_pred_count, label_wise_fuzz90_pred_count, folder_name="geo_reports", filename="fuzzy90_results.xlsx")
         print("Label Wise Correct Predictions Percentage: (For Fuzzy percentage>=90)")
+        get_key_count(label_wise_total_pred_count, actual_label_wise_count, label_wise_fuzz100_pred_count, folder_name="geo_reports")
         for l in label_wise_total_pred_count.keys():
             if l not in label_wise_fuzz90_pred_count.keys():
                 print(f">> Label {l}\t:\t0 / {label_wise_total_pred_count[l]}\t= 0 %")
@@ -674,6 +782,9 @@ if __name__ == '__main__':
     parser.add_argument('--save-txt', action='store_true', help='save results to *.txt')
     opt = parser.parse_args()
     print(opt)
-
+    excel_path = '/home/ntlpt19/Downloads/grasim_correction_remit_to,bill_to,ship_to (2).xlsx'
+    corrected_excel_df = pd.read_excel(excel_path)#, sheet_name='sheet1')
     with torch.no_grad():
         detect()
+    
+    
