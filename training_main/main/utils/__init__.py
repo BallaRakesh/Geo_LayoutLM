@@ -8,7 +8,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
 
-num_classes=31
+num_classes=30
 #/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/geolayoutlm_code_base_2/configs/val_config.yml
 def get_config(default_conf_file="./configs/val_config.yml"):
     cfg = OmegaConf.load(default_conf_file)

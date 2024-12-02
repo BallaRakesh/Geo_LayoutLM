@@ -55,7 +55,8 @@ class BROSModule(LightningModule):
         cfg_train = self.cfg.train
         lr_schedule_method = cfg_train.optimizer.lr_schedule.method
         lr_schedule_params = cfg_train.optimizer.lr_schedule.params
-
+        
+        print(f"Initial Learning Rate: {optimizer.param_groups[0]['lr']}")
         if lr_schedule_method is None:
             scheduler = LambdaLR(optimizer, lr_lambda=lambda _: 1)
         elif lr_schedule_method == "step":
@@ -76,7 +77,7 @@ class BROSModule(LightningModule):
             )
         else:
             raise ValueError(f"Unknown lr_schedule_method={lr_schedule_method}")
-
+        print(f"CURRENT Learning Rate: {optimizer.param_groups[0]['lr']}")
         return scheduler
 
     def _get_optimizer(self):
