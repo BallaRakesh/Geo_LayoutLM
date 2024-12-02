@@ -11,7 +11,7 @@ from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 from seqeval.metrics import f1_score, precision_score, recall_score
 from transformers import BertTokenizer
 from scipy.special import softmax
-
+import torch.nn.functional as F
 from lightning_modules.bros_module import BROSModule
 from utils import get_class_names, cfg_to_hparams, get_specific_pl_logger
 
@@ -126,6 +126,9 @@ def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
 def do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
     bio_class_names = eval_kwargs["bio_class_names"]
     pr_labels = torch.argmax(head_outputs["logits4labeling"], -1)
+    # Calculate confidence scores for each predicted label
+    probs = F.softmax(head_outputs["logits4labeling"], dim=-1)
+    confidence_scores = probs.gather(-1, pr_labels.unsqueeze(-1)).squeeze(-1)
     gt_str_list, pr_str_list, final_results = eval_ee_bio_batch(
         pr_labels,
         batch["bio_labels"],
@@ -133,6 +136,7 @@ def do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
         bio_class_names,
         dump_dir, batch,
         tokenizer=TOKENIZER,
+        confidence_scores = confidence_scores
     )
 
     step_out = {
@@ -145,11 +149,12 @@ def do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
 
 
 def eval_ee_bio_batch(pr_labels, gt_labels, are_box_first_tokens, bio_class_names, 
-        dump_dir='', batch=None, tokenizer=None):
+        dump_dir='', batch=None, tokenizer=None, confidence_scores = None):
     gt_str_list = []
     pr_str_list = []
     final_results = []
     bsz = pr_labels.shape[0]
+    # print(bsz)
     for example_idx in range(bsz):
         gt_str_i = parse_str_from_seq(
             gt_labels[example_idx],
@@ -161,7 +166,6 @@ def eval_ee_bio_batch(pr_labels, gt_labels, are_box_first_tokens, bio_class_name
             are_box_first_tokens[example_idx],
             bio_class_names,
         )
-
         gt_str_list.append(gt_str_i)
         pr_str_list.append(pr_str_i)
 
@@ -176,8 +180,9 @@ def eval_ee_bio_batch(pr_labels, gt_labels, are_box_first_tokens, bio_class_name
             img_name = os.path.splitext(os.path.basename(batch["image_path"][example_idx]))[0]
             txt_fn = f'{img_name}_tagging.txt'
             json_fn = f'{img_name}_tagging.json'
-            f = open(os.path.join(dump_dir, txt_fn), 'w')
-            f.writelines(batch["image_path"][example_idx] + '\n\n')
+            
+            # f = open(os.path.join(dump_dir, txt_fn), 'w')
+            # f.writelines(batch["image_path"][example_idx] + '\n\n')
 
             box_first_token_mask = are_box_first_tokens[example_idx].cpu().tolist()
             num_valid_tokens = batch["attention_mask"][example_idx].sum().item()
@@ -200,22 +205,34 @@ def eval_ee_bio_batch(pr_labels, gt_labels, are_box_first_tokens, bio_class_name
                     while tok_tmp_idx < num_valid_tokens and not box_first_token_mask[tok_tmp_idx]:
                         ids.append(input_ids[tok_tmp_idx])
                         tok_tmp_idx += 1
-                    word = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(ids))
+                        #need to check here
+                    ids = [id for id in ids if id != 102]
+                    tokens_ = tokenizer.convert_ids_to_tokens(ids)
+                    # word = tokens
+                    word = tokenizer.convert_tokens_to_string(tokens_).strip()
+                    # word = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(ids)).strip()
                     line += f"\t{word}"
                     # add coord info
                     block_box = block_boxes[token_idx]
                     line += f"\t{','.join([str(coord) for coord in block_box])}\n"
+                    confidence_score = confidence_scores[example_idx, token_idx].item()
+                    # line += f"\tConfidence: {confidence_score}\n"
                     res_dict.append({
                         'token_id': token_idx,
                         'actual_key': gt_str_i[valid_idx],
                         'pred_key': pr_str_i[valid_idx],
+                        'ids':ids,
+                        'tokens':tokens_,
                         'text': word,
-                        'coords': block_box
+                        'coords': block_box,
+                        'confidence': confidence_score
                     })
-                    f.writelines(line)
-            f.close()
-            with open(os.path.join(dump_dir, json_fn), 'w') as f:
-                json.dump(res_dict, f, indent=4)
+                    
+                    # f.writelines(line)
+            # f.close()
+            # with open(os.path.join(dump_dir, json_fn), 'w') as f:
+            #     json.dump(res_dict, f, indent=4)
+            
             final_results.append(res_dict)
             
     return gt_str_list, pr_str_list, final_results
@@ -354,8 +371,10 @@ def eval_el_geo_example(
         gt_relations = sorted(list(gt_relations))
         pr_relations = sorted(list(pr_relations))
         with open(os.path.join(dump_dir, txt_fn), 'w') as f:
-            f.writelines(batch["image_path"][example_idx] + '\n')
-            f.writelines('\n')
+            
+            # f.writelines(batch["image_path"][example_idx] + '\n')
+            # f.writelines('\n')
+            
             # record coordinates for each block (id)
             first_token_idxes = batch["first_token_idxes"][example_idx].cpu().tolist()
             block_mask = batch["block_mask"][example_idx].cpu().tolist()
@@ -369,9 +388,9 @@ def eval_el_geo_example(
                     break
                 block_box = block_boxes[first_token_id]
                 line = f"{blk_id}\t{','.join([str(coord) for coord in block_box])}\n"
-                f.writelines(line)
+                # f.writelines(line)
 
-            f.writelines('\n')
+            # f.writelines('\n')
             # record relations (father,son)
             for rel in pr_relations:
                 line = f"{rel[0]},{rel[1]}"
@@ -379,11 +398,11 @@ def eval_el_geo_example(
                     line += "\tRIGHT"
                 else:
                     line += "\tERROR"
-                f.writelines(line + '\n')
+                # f.writelines(line + '\n')
             for rel in gt_relations:
                 if rel not in pr_relations:
                     line = f"{rel[0]},{rel[1]}\tMISS"
-                    f.writelines(line + '\n')
+                    # f.writelines(line + '\n')
 
     return n_gt_rel, n_pr_rel, n_correct_rel
 

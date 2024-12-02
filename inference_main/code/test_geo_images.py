@@ -30,6 +30,7 @@ from tqdm import tqdm
 from PIL import Image, ImageDraw
 import shutil
 from typing import Dict, List
+import torch.nn.functional as F
 
 from glob import glob
 
@@ -41,7 +42,7 @@ from typing import Dict
 from prediction_utility import result_generation
 
 from result_utility import get_eval_kwargs_geolayoutlm_vie, getitem_geo
-from prediction_utility import result_generation
+# from prediction_utility import result_generation
 from pre_process_utility import main, gv_data
 
 from fastapi.responses import JSONResponse
@@ -62,17 +63,19 @@ config.read(App_Filepath + '/config.ini')
 
 geo_clsses_path = config['PATH']['GEO_CLASSES_PATH']
 geo_dump_dir = config['PATH']['GEO_DUMP']
-img_path = config['PATH']['DATA']
+MODEL_PATH = config['PATH']['MODEL_PATH']
 
 
 
-
-def load_model_weight(net, pretrained_model_file):
-    pretrained_model_file = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/epoch=16-f1_labeling=0.8964.pt'
-    print("Loading ckpt from:", pretrained_model_file)
+def load_model_weight(net, device_m):#, pretrained_model_file):
+    #grasim
+    # pretrained_model_file = MODEL_PATH #'/datadrive/geo_data/root/results/custom_trial/checkpoints/epoch=8-f1_labeling=0.9643.pt'
+    #ingram
+    # pretrained_model_file = '/datadrive/rakesh/epoch=10-f1_labeling=0.9647.pt'
+    
+    print("Loading ckpt from:", MODEL_PATH)
+    pretrained_model_state_dict = torch.load(MODEL_PATH, map_location=device_m)
     print("HERE")
-    pretrained_model_state_dict = torch.load(pretrained_model_file, map_location="cpu")
-    print("HERE 2")
     if "state_dict" in pretrained_model_state_dict.keys():
         pretrained_model_state_dict = pretrained_model_state_dict["state_dict"]
     new_state_dict = {}
@@ -107,24 +110,37 @@ eval_kwargs = get_eval_kwargs_geolayoutlm_vie(geo_clsses_path)
 def load_model():
     mode = "val"
     geo_cfg = get_config('./configs/finetune_funsd.yaml')
-    # geo_cfg.dump_dir = '/New_Volume/number_theory/GEO_Rakesh/master_table_extraction/data/output/invoice_test/headers/geo_out'
-    pt_list = os.listdir(os.path.join(geo_cfg.workspace, "checkpoints"))
-    if len(pt_list) == 0:
-        print("Checkpoint file is NOT FOUND!")
-    pt_to_be_loaded = pt_list[0]
-    if len(pt_list) > 1:
-        # import ipdb;ipdb.set_trace()
-        for pt in pt_list:
-            if geo_cfg[mode].pretrained_best_type in pt:
-                pt_to_be_loaded = pt
-                break
-    geo_cfg.pretrained_model_file = os.path.join(geo_cfg.workspace, "checkpoints", pt_to_be_loaded)
-    print(geo_cfg)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
+    # geo_cfg.dump_dir = '/New_Volume/number_theory/GEO_Rakesh/master_table_extraction/data/output/invoice_test/headers/geo_out'
+    
+    # pt_list = os.listdir(os.path.join(geo_cfg.workspace, "checkpoints"))
+    # if len(pt_list) == 0:
+    #     print("Checkpoint file is NOT FOUND!")
+    # pt_to_be_loaded = pt_list[0]
+    # if len(pt_list) > 1:
+    #     # import ipdb;ipdb.set_trace()
+    #     for pt in pt_list:
+    #         if geo_cfg[mode].pretrained_best_type in pt:
+    #             pt_to_be_loaded = pt
+    #             break
+            
+    # geo_cfg.pretrained_model_file = os.path.join(geo_cfg.workspace, "checkpoints", pt_to_be_loaded)
+    # print(geo_cfg)
+    geo_cfg.pretrained_model_file = ''
     net = get_model(geo_cfg)
-    load_model_weight(net, geo_cfg.pretrained_model_file)
-    net.to("cpu")
+    load_model_weight(net, device)#, geo_cfg.pretrained_model_file)
+    # net.to("cpu")
+    # net.eval()
+    
+    # Move model to the correct device (CUDA or CPU)
+    net.to(device)
+    # Set model to evaluation mode
     net.eval()
+    # If you need the device the model is on, you can still check it
+    # current_device = next(net.parameters()).device
+    # print(f"Model is on device: {current_device}")
+    
     
     return net
 
@@ -138,7 +154,20 @@ def predict(net, image, json_obj, backbone_type='geolayoutlm'):
     # net.eval()
     #device = 'cpu'
     # model.to(device)
-    device = next(net.parameters()).device
+    ####################################################
+    # device = next(net.parameters()).device
+    ####################################################
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Move model to the correct device (CUDA or CPU)
+    net.to(device)
+    # Set model to evaluation mode
+    net.eval()
+    current_device = next(net.parameters()).device
+    print(f"Model is on device: {current_device}")
+    
+    # Ensure CUDA is available
+    print(f"Model is on device: {device}")
     for key, value in input_data.items():
     # Apply torch.unsqueeze to each element in the tensor
         try:
@@ -335,64 +364,64 @@ def image_to_base64(image_path):
 
 
 
-def get_geo_result_final(image_base64, file_name, OCR_path):
+def get_geo_result_final(image_base64, file_path, OCR_path):
     # input_json = await req.json()
     # image = input_json.get("image")
-    image = image_base64
-    img_path = config['PATH']['DATA']
+    # image = image_base64
+    # img_path = config['PATH']['DATA']
     
     #img_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words'
-    try:
-        im = Image.open(BytesIO(base64.b64decode(image)))            
-        # image_save = os.path.join(folder_path, "invoice_test")
-        if not os.path.exists(img_path):
-            os.mkdir(img_path)            
-        pic = os.path.join(img_path, file_name)
-        im.save(pic, 'PNG')
-        print("++++++++++==")  
-    except:
-        flag=1
-    # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
-    img_path = os.path.join(img_path, file_name)
-    ocr_file = file_name.replace('.png', '.png_textAndCoordinates.txt')
+    # try:
+    #     im = Image.open(BytesIO(base64.b64decode(image)))            
+    #     # image_save = os.path.join(folder_path, "invoice_test")
+    #     if not os.path.exists(img_path):
+    #         os.mkdir(img_path)            
+    #     pic = os.path.join(img_path, file_name)
+    #     im.save(pic, 'PNG')
+    #     print("++++++++++==")  
+    # except:
+    #     flag=1
+    # # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
+    # img_path = os.path.join(img_path, file_name)
+    file_name = os.path.basename(file_path)
+    ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
 
     # with open(all_words_path, 'r') as file:
     #     all_words_ = json.load(file)
-    all_words_ = gv_data(img_path, ocr_file = os.path.join(OCR_path,ocr_file))
+    all_words_ = gv_data(file_path, ocr_file = os.path.join(OCR_path,ocr_file))
     pre_data1 = main(all_words_)
     print(pre_data1)
 
 
 
 
-    final_results = []
+    geo_final_results = []
     for data_ in pre_data1:
         print('>>>>>>>>>>>>>>>>>>')
         print('>>>>>>>>>>>>>>>>>>')
         # print(data_['form'])
-        out_json_obj = preprocessData(data_['form'], img_path)
+        out_json_obj = preprocessData(data_['form'], file_path)
         print(out_json_obj)
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
-        print('>>>>>>>>>>>>>>>>')
-        print('>>>>>>>>>>>>>>>>')
-        print('>>>>>>>>>>>>>>>>')
-        print()
-        final_results.extend(geo_results[0])
-    print(final_results)
-    geo_final_result = result_generation(img_path, final_results)
+
+        geo_final_results.extend(geo_results[0])
+    # exit('OKKKKKKKKKKKKKKKKKKKKKK')
+    geo_final_result = result_generation(file_path, geo_final_results)
     #result_generation('/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial__/vis/Invoice_405_28_s_1_linking.png', '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results/_tagging.json')
     # return JSONResponse(content=geo_final_result,status_code=200)
 
 
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/EVAL_data/Images'
-    data_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/EVAL_data/data'
-    OCR_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/geo_layout_training_data/header_detection_files/OCR'
+    images_path = '/datadrive/rakesh/Ingram_POC_Samples/issues_verify/images_working'
+    OCR_path = '/datadrive/rakesh/Ingram_POC_Samples/issues_verify/ocr'
+    
+    # data_path = '/datadrive/geo_data/grasim_test_samples/data'
+    os.makedirs(geo_dump_dir, exist_ok=True)
     for images_files in os.listdir(images_path):
-        if not os.path.exists(os.path.join(data_path, images_files)):
+        if not os.path.exists(os.path.join(geo_dump_dir, images_files)):
             image_base64_ = image_to_base64(os.path.join(images_path, images_files))
-            get_geo_result_final(image_base64_, images_files, OCR_path)
+            get_geo_result_final(image_base64_, os.path.join(images_path, images_files), OCR_path)
         else:
             print(f'File {images_files} already exists.')

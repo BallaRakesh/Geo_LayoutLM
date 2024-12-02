@@ -7,10 +7,32 @@ from omegaconf.dictconfig import DictConfig
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 from pytorch_lightning.plugins import DDPPlugin
+import configparser
+
+config = configparser.ConfigParser()
+App_Filepath = os.path.dirname(os.path.abspath(__file__))
+config.read(os.path.dirname(App_Filepath) + '/config.ini')
+geo_clsses_path = config['PATH']['GEO_CLASSES_PATH']
+
+
+# Open and read the file line by line
+with open(geo_clsses_path, 'r') as file:
+    lines = file.readlines()
+
+# Remove any empty lines and strip whitespace
+keys = [line.strip() for line in lines if line.strip()]
+
+# Calculate the number of keys minus one
+num_classes = len(keys) - 1
+
+# Print or use num_classes as needed
+print("Number of classes:", num_classes)
+
 
 # num_classes= 67
-num_classes= 2
-
+# num_classes= 34
+# num_classes= 31
+# with open()
 #/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/geolayoutlm_code_base_2/configs/val_config.yml
 def get_config(default_conf_file="./configs/val_config.yml"):
     cfg = OmegaConf.load(default_conf_file)
