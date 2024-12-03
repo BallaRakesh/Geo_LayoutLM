@@ -12,44 +12,6 @@ MAX_SEQ_LENGTH = 512
 MODEL_TYPE = "bert"
 VOCA = "bert-base-uncased"
 
-classes_path = "/home/gpu1admin/rakesh/ingram_rakesh_data/label.txt"
-with open(classes_path, 'r') as f:
-    classes = f.readlines()
-
-CLASSES = [item.replace('\n', '').strip() for item in classes]
-CLASSES.insert(0, 'O') #, "HEADER", "QUESTION", "ANSWER"]
-
-CLASSES_VALID = CLASSES[1:] # ["HEADER", "QUESTION", "ANSWER"]
-
-INPUT_PATH = "/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format"
-anno_dir = 'Annotations'
-
-#Train and validation split
-
-# Path to the folder containing images and annotations (note: complete data)
-data_folder = '/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
-# Paths to the train and validation folders
-
-train_folder = os.path.join(data_folder, 'training_data')
-val_folder = os.path.join(data_folder,'testing_data')
-Traintestsplit(data_folder, train_folder, val_folder)
-
-data_seg= DataSegmentation(data_folder, train_folder, val_folder)
-
-# data_seg.__testDataSeg__()
-
-# data_seg.__trainDataSeg__()
-# exit('++++++++++++=')
-
-
-# if not os.path.exists(INPUT_PATH):
-#     os.system("wget https://guillaumejaume.github.io/FUNSD/dataset.zip")
-#     os.system("unzip dataset.zip")
-#     os.system("rm -rf dataset.zip __MACOSX")
-
-OUTPUT_PATH = os.path.join(data_folder, "dataset/custom_geo")
-os.makedirs(OUTPUT_PATH, exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_PATH, "preprocessed"), exist_ok=True)
 
 
 def main():
@@ -194,9 +156,9 @@ def do_preprocess(tokenizer, dataset_split):
             json.dump(out_json_obj, fp, ensure_ascii=False)
 
     # Save file name list file
-    preprocessed_filelist_file = os.path.join(
-        OUTPUT_PATH, f"preprocessed_files_{dataset_split}.txt"
-    )
+    preprocessed_filelist_file = os.path.join(OUTPUT_PATH, f"preprocessed_files_{dataset_split}.txt")
+    if dataset_split == 'test':
+        preprocessed_filelist_file = os.path.join(OUTPUT_PATH, "preprocessed_files_val.txt")
     with open(preprocessed_filelist_file, "w", encoding="utf-8") as fp:
         fp.write("\n".join(preprocessed_fnames))
 
@@ -209,4 +171,42 @@ def save_class_names():
 
 
 if __name__ == "__main__":
+    classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/label.txt"
+    INPUT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/data_in_funsd_format"
+    
+    data_folder = INPUT_PATH #'/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
+    
+    with open(classes_path, 'r') as f:
+        classes = f.readlines()
+
+    CLASSES = [item.replace('\n', '').strip() for item in classes]
+    CLASSES.insert(0, 'O') #, "HEADER", "QUESTION", "ANSWER"]
+
+    CLASSES_VALID = CLASSES[1:] # ["HEADER", "QUESTION", "ANSWER"]
+
+    anno_dir = 'Annotations'
+
+    #Train and validation split
+
+    # Path to the folder containing images and annotations (note: complete data)
+    # Paths to the train and validation folders
+
+    train_folder = os.path.join(data_folder, 'training_data')
+    val_folder = os.path.join(data_folder,'testing_data')
+    # Traintestsplit(data_folder, train_folder, val_folder)
+
+    data_seg= DataSegmentation(data_folder, train_folder, val_folder)
+
+    data_seg.__testDataSeg__()
+
+    data_seg.__trainDataSeg__()
+    # exit('++++++++++++=')
+
+    # if not os.path.exists(INPUT_PATH):
+    #     os.system("wget https://guillaumejaume.github.io/FUNSD/dataset.zip")
+    #     os.system("unzip dataset.zip")
+    #     os.system("rm -rf dataset.zip __MACOSX")
+    OUTPUT_PATH = os.path.join(data_folder, "dataset/custom_geo")
+    os.makedirs(OUTPUT_PATH, exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_PATH, "preprocessed"), exist_ok=True)
     main()
