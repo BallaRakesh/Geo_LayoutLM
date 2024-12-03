@@ -475,6 +475,11 @@ def gv_data(img_path, ocr_file = False):
             content = file.read()  # Reads the entire file content
             # print(content)  # Display the content
         word_coordinates = ast.literal_eval(content)
+        if isinstance(word_coordinates, dict):
+            word_coordinates = word_coordinates.get('word_coordinates', [])
+            if len(word_coordinates) == 0:
+                raise ValueError(f"empty word coordinates: {word_coordinates}")
+        
     else:
         print('NO data available')
         return None

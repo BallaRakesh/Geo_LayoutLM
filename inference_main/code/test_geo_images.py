@@ -385,7 +385,8 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     # img_path = os.path.join(img_path, file_name)
     file_name = os.path.basename(file_path)
     ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
-
+    if not os.path.exists(os.path.join(OCR_path,ocr_file)):
+        ocr_file = file_name.replace('.png', '_text.txt')
     # with open(all_words_path, 'r') as file:
     #     all_words_ = json.load(file)
     all_words_ = gv_data(file_path, ocr_file = os.path.join(OCR_path,ocr_file))

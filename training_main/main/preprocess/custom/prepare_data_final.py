@@ -213,152 +213,156 @@ def get_text(ocr_region, labelled_region, words_coords=None, words=None, all_wor
         return res, coords
 
 
-root_path = "/home/gpu1admin/rakesh/ingram_rakesh_data"
+def gen_data_in_funsd_format(root_path):
+    ocr_path = os.path.join(root_path, "custom_data/key_val_sets")
+    all_words_path = os.path.join(root_path, "custom_data/all_words")
 
-ocr_path = os.path.join(root_path, "custom_data/key_val_sets")
-all_words_path = os.path.join(root_path, "custom_data/all_words")
+    save_to = os.path.join(root_path, "data_in_funsd_format")
+    os.makedirs(os.path.join(save_to, 'images'), exist_ok=True)
+    os.makedirs(os.path.join(save_to, 'annotations'), exist_ok=True)
 
-save_to = os.path.join(root_path, "data_in_funsd_format")
-os.makedirs(os.path.join(save_to, 'images'), exist_ok=True)
-os.makedirs(os.path.join(save_to, 'annotations'), exist_ok=True)
+    labels_path = os.path.join(root_path, 'Labels')
+    images_path = os.path.join(root_path, 'Images')
 
-labels_path = os.path.join(root_path, 'Labels')
-images_path = os.path.join(root_path, 'Images')
+    classes_path = os.path.join(root_path, "label.txt")
+    with open(classes_path, 'r') as f:
+        classes = f.readlines()
 
-classes_path = os.path.join(root_path, "label.txt")
-with open(classes_path, 'r') as f:
-    classes = f.readlines()
+    classes = [item.replace('\n','').strip() for item in classes]
 
-classes = [item.replace('\n','').strip() for item in classes]
+    images_list = os.listdir(images_path)
+    labels_list = os.listdir(labels_path)
 
-images_list = os.listdir(images_path)
-labels_list = os.listdir(labels_path)
+    labels_list = [item for item in labels_list if item.replace('txt', 'png') in images_list]
 
-labels_list = [item for item in labels_list if item.replace('txt', 'png') in images_list]
+    for labels in tqdm(labels_list, desc="Preparing"):
+        print(f'file name: {labels}')
+        # exit('++++++++++++++++=')
+        with open(os.path.join(labels_path, labels), 'r') as f:
+            label_data  = f.readlines()
+            # for label in label_data:
+            #     print(label.split(' ')[0])
+            #     # exit('++++++++++++++')
+            #     if int(label.split(' ')[0])==36:
+            #         label_data.remove(label)
+            print(label_data)
+            # exit('+++++++++++++++')
+        ocr_name = labels.replace('txt','json')
+        # with open(os.path.join(ocr_path, ocr_name) , 'r') as f:  # CHNAGE
+        #     ocr_labels = json.load(f)
+            # print(f'ocr labels: {ocr_labels}')
+            # exit('+++++++++++++++++++++++=')
+        with open(os.path.join(all_words_path, ocr_name), 'r')   as f:
+            all_words = json.load(f)
 
-for labels in tqdm(labels_list, desc="Preparing"):
-    print(f'file name: {labels}')
-    # exit('++++++++++++++++=')
-    with open(os.path.join(labels_path, labels), 'r') as f:
-        label_data  = f.readlines()
-        # for label in label_data:
-        #     print(label.split(' ')[0])
-        #     # exit('++++++++++++++')
-        #     if int(label.split(' ')[0])==36:
-        #         label_data.remove(label)
+        classes_enum = [int(item.split()[0]) for item in label_data]
+        # value_to_remove = 36                       # remove document settlement instruction
+        # classes_enum.remove(value_to_remove)
+        print(classes_enum)
+        if not len(classes_enum):
+            continue
+        print(max(classes_enum))
+        print(classes)
+        print(len(classes))
+        # exit('++++++++++++++')
+
+        if max(classes_enum) > len(classes):
+            continue
+        label_data = [item.split()[1:] for item in label_data]
         print(label_data)
-        # exit('+++++++++++++++')
-    ocr_name = labels.replace('txt','json')
-    # with open(os.path.join(ocr_path, ocr_name) , 'r') as f:  # CHNAGE
-    #     ocr_labels = json.load(f)
-        # print(f'ocr labels: {ocr_labels}')
-        # exit('+++++++++++++++++++++++=')
-    with open(os.path.join(all_words_path, ocr_name), 'r')   as f:
-        all_words = json.load(f)
+        # exit('+++++++++++++')
+        label_data = [[float(item) for item in line ] for line in label_data]
+        # print('++++++++++++++++++++++=====')
+        print(label_data)
+        # exit('+++++++++++')
 
-    classes_enum = [int(item.split()[0]) for item in label_data]
-    # value_to_remove = 36                       # remove document settlement instruction
-    # classes_enum.remove(value_to_remove)
-    print(classes_enum)
-    if not len(classes_enum):
-        continue
-    print(max(classes_enum))
-    print(classes)
-    print(len(classes))
-    # exit('++++++++++++++')
+        image_name = labels.replace('txt','png')
+        image_loc = os.path.join(images_path, image_name)
 
-    if max(classes_enum) > len(classes):
-        continue
-    label_data = [item.split()[1:] for item in label_data]
-    print(label_data)
-    # exit('+++++++++++++')
-    label_data = [[float(item) for item in line ] for line in label_data]
-    # print('++++++++++++++++++++++=====')
-    print(label_data)
-    # exit('+++++++++++')
+        shutil.copy(image_loc, os.path.join(save_to,'images',image_name))
 
-    image_name = labels.replace('txt','png')
-    image_loc = os.path.join(images_path, image_name)
+        image_org=Image.open(image_loc)
+        image = Image.new('RGBA', image_org.size)
+        image.paste(image_org)
+        w, h = image_org.size
 
-    shutil.copy(image_loc, os.path.join(save_to,'images',image_name))
+        denormalized_coords = [denormalize(h, w, coord) for coord in label_data]
+        print(denormalized_coords)
+        # exit('+++++++++++++=')
 
-    image_org=Image.open(image_loc)
-    image = Image.new('RGBA', image_org.size)
-    image.paste(image_org)
-    w, h = image_org.size
+        draw=ImageDraw.Draw(image)
 
-    denormalized_coords = [denormalize(h, w, coord) for coord in label_data]
-    print(denormalized_coords)
-    # exit('+++++++++++++=')
-
-    draw=ImageDraw.Draw(image)
-
-    
-    #exit(s)
-    for enum, coord in enumerate(denormalized_coords):
-        draw.rectangle([coord[0], coord[1], coord[2], coord[3]], width=3 ,outline='blue') #, fill=(0, 0, 255, 125))
-        draw.text((coord[0]+10, coord[1]-10), text=classes[classes_enum[enum]], fill='blue')
         
+        #exit(s)
+        for enum, coord in enumerate(denormalized_coords):
+            draw.rectangle([coord[0], coord[1], coord[2], coord[3]], width=3 ,outline='blue') #, fill=(0, 0, 255, 125))
+            draw.text((coord[0]+10, coord[1]-10), text=classes[classes_enum[enum]], fill='blue')
+            
+            
+        #exit()
+        # ocr_labels_temp = copy(ocr_labels)   #change
+        labels_data_temp = copy(denormalized_coords)
+
+        keep_coords = []
+
+        id_counter = 0  
+
+
+        value_cntr = 1000
+        key_cntr = 0
+        #other_contr= len(ocr_labels)#   change
+
+        value_dict = {}
+        key_dict = {}
+
+        covered_keys = []
+        val_box=[]
+        key_box=[]
+
+        # print(f'ocr labels: {ocr_labels}') #change
+        # print(len(ocr_labels)) #change
+        print(classes_enum)
+        print(labels_data_temp)
+        # exit('+++++++++++++++=')
+        json_dict= {}
+        label_contr=0
+        other_contr= 500
+        for i, item in enumerate(all_words):   
+            word= all_words[item]['text']
+            bbox= all_words[item]['bbox']
+            overlapped= False
+            for j, label_coords in enumerate(labels_data_temp):
+                if (calculate_iou(label_coords, bbox)) >0.4:
+                    json_dict.update({label_contr : { 
+                                            'id' : label_contr,
+                                            'box': all_words[item]['bbox'],
+                                            'label': classes[classes_enum[j]],
+                                            'text': word,
+                                            'words' : [{'text': all_words[item]['text'], 
+                                                        'box':all_words[item]['bbox']}],
+                                            'linking': []
+                                            }})
+                    label_contr+=1
+                    overlapped=True
+            if not overlapped:
+                json_dict.update({other_contr : { 
+                                            'id' : other_contr,
+                                            'box': all_words[item]['bbox'],
+                                            'label': 'other',
+                                            'text': word,
+                                            'words' : [{'text': all_words[item]['text'], 
+                                                        'box':all_words[item]['bbox']}],
+                                            'linking': []
+                                            }})
+                other_contr+=1
+            
         
-    #exit()
-    # ocr_labels_temp = copy(ocr_labels)   #change
-    labels_data_temp = copy(denormalized_coords)
+        final_data = [json_dict[item] for item in json_dict]
+        print(f'total number of words: {len(final_data)}')
+        with open(os.path.join(save_to,'annotations' ,ocr_name), 'w') as f:
+            json.dump({"form" : final_data}, f, indent=4)
+            
 
-    keep_coords = []
-
-    id_counter = 0  
-
-
-    value_cntr = 1000
-    key_cntr = 0
-    #other_contr= len(ocr_labels)#   change
-
-    value_dict = {}
-    key_dict = {}
-
-    covered_keys = []
-    val_box=[]
-    key_box=[]
-
-    # print(f'ocr labels: {ocr_labels}') #change
-    # print(len(ocr_labels)) #change
-    print(classes_enum)
-    print(labels_data_temp)
-    # exit('+++++++++++++++=')
-    json_dict= {}
-    label_contr=0
-    other_contr= 500
-    for i, item in enumerate(all_words):   
-        word= all_words[item]['text']
-        bbox= all_words[item]['bbox']
-        overlapped= False
-        for j, label_coords in enumerate(labels_data_temp):
-            if (calculate_iou(label_coords, bbox)) >0.4:
-                json_dict.update({label_contr : { 
-                                        'id' : label_contr,
-                                        'box': all_words[item]['bbox'],
-                                        'label': classes[classes_enum[j]],
-                                        'text': word,
-                                        'words' : [{'text': all_words[item]['text'], 
-                                                    'box':all_words[item]['bbox']}],
-                                        'linking': []
-                                        }})
-                label_contr+=1
-                overlapped=True
-        if not overlapped:
-            json_dict.update({other_contr : { 
-                                        'id' : other_contr,
-                                        'box': all_words[item]['bbox'],
-                                        'label': 'other',
-                                        'text': word,
-                                        'words' : [{'text': all_words[item]['text'], 
-                                                    'box':all_words[item]['bbox']}],
-                                        'linking': []
-                                        }})
-            other_contr+=1
-        
-    
-    final_data = [json_dict[item] for item in json_dict]
-    print(f'total number of words: {len(final_data)}')
-    with open(os.path.join(save_to,'annotations' ,ocr_name), 'w') as f:
-        json.dump({"form" : final_data}, f, indent=4)
+if __name__ == "__main__":
+    ROOT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data"
+    gen_data_in_funsd_format(ROOT_PATH)
