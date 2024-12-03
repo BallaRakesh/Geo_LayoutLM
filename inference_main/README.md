@@ -16,6 +16,24 @@ In the `test_geo_images.py` file, ensure the following paths are set:
   - `images_path`: This variable defines the path to the directory of images for Inference.
   - `OCR_path`: This variable specifies the path to the directory containing OCR (Optical Character Recognition)
 
+### Results convertion
+
+To convert results to expected format
+```bash
+python result_conversion.py
+```
+### Input and Output Folders
+
+- **Input Folder**: This directory contains the raw results that need to be processed.
+  ```
+  /home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/results
+  ```
+
+- **Output Folder**: This directory is where the converted results will be saved.
+  ```
+  /home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/final_results
+  ```
+- **Note**:  Before running the conversion process, ensure that any files prefixed with _linking are deleted from the input folder. These files may interfere with the conversion process and should not be included.
 
 ## Configuration File
 

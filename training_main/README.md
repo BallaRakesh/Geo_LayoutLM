@@ -37,8 +37,8 @@ python funsd_gv.py
 Update the following paths in the `funsd_gv.py` script:
 
 ```python
-ocr_file = '/home/gpu1admin/rakesh/ingram_rakesh_data/ocr'
-root_path = '/home/gpu1admin/rakesh/ingram_rakesh_data'
+    OCR_PATH = '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/OCR'
+    ROOT_PATH = '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data'
 ```
 
 ### Preparing Data in FUNSD-like Format
@@ -52,7 +52,8 @@ python ./preprocess/custom/prepare_data_final.py
 Ensure the `root_path` is set correctly in the script:
 
 ```python
-root_path = "/home/gpu1admin/rakesh/ingram_rakesh_data"
+    ROOT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data"
+
 ```
 
 ### Processing Data for Training
@@ -68,11 +69,32 @@ python python ./preprocess/custom/preprocess_for_training.py
 Update the following paths in the `preprocess_for_training.py` script:
 
 ```python
-classes_path = "/home/gpu1admin/rakesh/ingram_rakesh_data/label.txt"
-INPUT_PATH = "/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format"
-data_folder = '/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
+    classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/label.txt"
+    INPUT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/data_in_funsd_format"
+    
 ```
+**Custom Data Split Configuration** 
 
+This document provides details on the custom data splitting configuration used in this project.  
+
+### Custom Split  
+
+The custom split for the dataset is enabled through the `custom_split` parameter. When set to `True`, it allows the user to define their own training, testing, and evaluation datasets.  
+
+### Configuration  
+
+- **custom_split**: `True`  
+- **splitting_files**: Specifies the paths to the file lists for each dataset split.  
+
+
+```python  
+custom_split = True  
+splitting_files = {  
+    'train': '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/train_files.txt',  
+    'test': '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/test_files.txt',  
+    'eval': ''  # Leave as an empty string if evaluation data is not being used  
+}
+```
 ### Configuration Changes
 
 Make sure you have made the following changes in the configuration files:
