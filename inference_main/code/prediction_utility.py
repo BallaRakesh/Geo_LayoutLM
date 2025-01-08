@@ -10,6 +10,7 @@ import re
 from PIL import ImageSequence
 import cv2
 from constants import arial_file
+from fuzzywuzzy import fuzz
 
 App_Filepath = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
@@ -983,8 +984,79 @@ def lookup(
 		print(traceback.format_exc())
 
 
+
+            
+def find_ocr_text_in_bbox(target_bbox, ocr_data):
+    """
+    Find all OCR text entries that fall within a target bounding box.
+    
+    Args:
+        target_bbox (list): [x1, y1, x2, y2] coordinates of target box
+        ocr_data (dict): Dictionary of OCR data with bounding boxes
+    
+    Returns:
+        str: Concatenated text of all matching OCR entries
+    """
+    matching_text = []
+    
+    def is_within_bbox(box1, box2):
+        # Check if box1 is within or overlaps significantly with box2
+        x1, y1, x2, y2 = box1
+        tx1, ty1, tx2, ty2 = box2
+        
+        # Calculate overlap area
+        x_left = max(x1, tx1)
+        y_top = max(y1, ty1)
+        x_right = min(x2, tx2)
+        y_bottom = min(y2, ty2)
+        
+        if x_right > x_left and y_bottom > y_top:
+            overlap_area = (x_right - x_left) * (y_bottom - y_top)
+            box1_area = (x2 - x1) * (y2 - y1)
+            overlap_ratio = overlap_area / box1_area
+            return overlap_ratio > 0.5
+        return False
+
+    # Find all OCR entries that fall within the target bbox
+    for ocr_id, ocr_entry in ocr_data.items():
+        ocr_bbox = ocr_entry['bbox']
+        if is_within_bbox(ocr_bbox, target_bbox):
+            matching_text.append(ocr_entry['text'])
+    
+    return ' '.join(matching_text)
+
+def process_results_with_ocr(results, ocr_data):
+	"""
+	Process results dictionary and add OCR text for each bbox entry.
+
+	Args:
+		results (dict): Dictionary containing results with bboxes
+		ocr_data (dict): Dictionary of OCR data
+
+	Returns:
+		dict: Updated results dictionary with OCR text
+	"""
+	processed_results = {}
+
+	for key, value_list in results.items():
+		processed_results[key] = []
+		for entry in value_list:
+			# Each entry is [text, bbox, confidence]
+			text, bbox, confidence = entry
+			ocr_text = find_ocr_text_in_bbox(bbox, ocr_data)
+			ratio = fuzz.ratio(str(text).lower().replace(' ', ''), str(ocr_text).lower().replace(' ', ''))
+			# Append the OCR text as the fourth element
+			if ratio == 100:  # You can adjust this threshold
+				# processed_results[key].append([text, bbox, confidence, ocr_text]) #1**
+				processed_results[key].append([ocr_text, bbox, confidence])
+			else:
+				processed_results[key].append([text, bbox, confidence])
+				
+	return processed_results
+
+
 #result_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results'
-def result_generation(img_path, token_data):
+def result_generation(img_path, token_data, all_words_):
 	# input_path= "/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial"
 	# file_path= os.path.join(input_path,'Results/annotations')
 	# result_path = os.path.join(input_path, "Results_CS_validated")
@@ -1052,11 +1124,20 @@ def result_generation(img_path, token_data):
 						result_set[(token_data[i]['pred_key']).split('-')[1]] = []
 					result_set[(token_data[i]['pred_key']).split('-')[1]].append([token_data[i]['text'], token_data[i]['coords'], float(np.round(token_data[i].get('confidence', 0.00), 6))])
 		print(result_set)
+  
+		result_set = process_results_with_ocr(result_set, all_words_) # added
 		model_output = result_set.copy()
+  
 		with open(os.path.join(result_path, file + str(count) + "model_output.txt"), "w") as f:
 			json.dump(result_set, f)
 		f.close()
-		
+		print(result_set)
+		########################################### #2**
+		# print(updated_result)
+		# with open(os.path.join(result_path, file + str(count) + "model_output_updated.txt"), 'w') as frs_:
+		# 	frs_.write(str(updated_result))
+		# frs_.close()
+		#################################
 		final_result_set = {}
 		
 		for k in list(result_set.keys()):
@@ -1152,59 +1233,6 @@ def result_generation(img_path, token_data):
 						final_result_set[k].append([result_set[k][0][0], result_set[k][0][1], 0.00])
 					
 
-
-		
-		
-		'''
-		for k in list(result_set.keys()):
-			try:
-				alpha = float(config[k]['ALPHA'])
-			except:
-				alpha = float(config['Default']['ALPHA'])
-			if len(result_set[k]) > 1:
-				print("++++++++++++++entry in this block+++++++++++")
-				texts = [x[0] for x in result_set[k]]
-				bboxes = [x[1] for x in result_set[k]]
-				# confs = [x[2] for x in result_set[k]]
-				avg_w = np.mean([abs(x[0] - x[2]) for x in bboxes])
-				avg_h = np.mean([abs(x[1] - x[3]) for x in bboxes])
-				eps = np.sqrt(avg_w ** 2 + avg_h ** 2) * alpha
-				if eps<=0.0:
-					eps=0.1
-				clustering = DBSCAN(eps=eps, min_samples=1).fit(bboxes)
-				label_set = set(clustering.labels_)
-				for l in label_set:
-					selected = list(np.where(clustering.labels_ == l)[0])
-					selected_texts = [x for i, x in enumerate(texts) if i in selected]
-					selected_boxes = [x for i, x in enumerate(bboxes) if i in selected]
-					# selected_confs = [x for i, x in enumerate(confs) if i in selected]
-					text_boxes = [[x, y] for x, y in zip(selected_texts, selected_boxes)]
-					text_boxes = sorted(text_boxes, key=cmp_to_key(contour_sort))
-					text_result = ""
-
-					for tb in text_boxes:
-						if text_result == "":
-							text_result += tb[0]
-						else:
-							text_result += " " + tb[0]
-					# print(text_result)
-					x1 = min([x[0] for x in selected_boxes])
-					x2 = max([x[2] for x in selected_boxes])
-					y1 = min([x[1] for x in selected_boxes])
-					y2 = max([x[3] for x in selected_boxes])
-					box_result = [x1, y1, x2, y2]
-					# conf_result = float(np.round(np.mean(selected_confs), 2))
-					# print(box_result)
-					if k not in list(final_result_set.keys()):
-						final_result_set[k] = []
-					final_result_set[k].append([text_result, box_result])
-			else:
-				if k not in list(final_result_set.keys()):
-					final_result_set[k] = []
-				final_result_set[k].append([result_set[k][0][0],result_set[k][0][1]])  
-				'''
-				
-				
 		print(final_result_set)
 		merge_surrounding(final_result_set, model_output, w, h)
 		print("+++++++++++reached here after merge surrounding++++++++++")
@@ -1218,47 +1246,7 @@ def result_generation(img_path, token_data):
 				draw.rectangle(value[1], outline=label2color[k], width=2)
 				draw.text((value[1][0] + 5, value[1][1] - 20),
 							text=k , fill=label2color[k], font=font)
-		lookup_result = {}
-		# t_page_end = datetime.now()
-		# print("Time taken for page" + str(count) + ":", end=" ")
-		# print(t_page_end - t_page_start)
-		# print()
-		# all_page_result["Page Number " + str(count)] = final_result_set
-		# print(all_page_result)
-		for k in list(final_result_set.keys()):
-			if k in ["applicant_country", "beneficiary_country"]:
-				for val in final_result_set[k]:
-					result_country = lookup(val[0], 4, 90, "countries.txt", result_set, k)
-					result_company = lookup(val[0], 4, 90, "organization.txt", result_set, k)
-					# print(val)
-					# print(result)
-					# replacing ocr result with correct result
-					for res in result_company:
-						found = res['found_string']
-						searched = res['searched_string']
-						new_val = val[0].replace(searched, found)
-						val[0] = new_val
-					# replacing ocr result with correct result
-					for res in result_country:
-						found = res['found_string']
-						searched = res['searched_string']
-						new_val = val[0].replace(searched, found)
-						val[0] = new_val
-					for res in result_country:
-						if (str(k) + "-country") not in lookup_result:
-							lookup_result[('LUT_' + str(k) + "-country")] = []
-						lookup_result[('LUT_' + str(k) + "-country")].append(
-							(res['found_string'], res['string_match_value'], res["bbox"]))
-					for res in result_company:
-						if (str(k) + "-organization") not in lookup_result:
-							lookup_result[('LUT_' + str(k) + "-organization")] = []
-						lookup_result[('LUT_' + str(k) + "-organization")].append(
-							(res['found_string'], res['string_match_value'], res["bbox"]))
-		# print(lookup_result)
-		with open(os.path.join(result_path, file+ "_lookup.txt"), "w") as f:
-			json.dump(lookup_result, f)
-		print(f'final set : ++++++++++++++++++++++++++++++++++++++++++++')
-		print(final_result_set)
+
 		print(file)
 		# exit('++++++++++++++++')
 		with open(os.path.join(result_path, file + ".txt"), "w") as f:
