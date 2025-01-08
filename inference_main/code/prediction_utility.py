@@ -564,7 +564,6 @@ def merge_by_skipping_running(model_output, w, h, key, all_values):
 				# 		bb1_height <= bb1_width and bb2_height <= bb2_width):
 
 				print('entered into first if')
-				print(">>>>>>>>>>RRRRRRRRAAAAAAAAAKKKKKKKEEE", min_dist_horizontal)
 				if key in master_keys or vertical_alignment_bbox:
 					merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) or (
 							min_dist_vertical <= eps_vertical2 or IOU_vertical > 0 or inter_percentage)
@@ -763,7 +762,6 @@ def merge_surrounding(data, model_output, w, h):
 							# 		bb1_height <= bb1_width and bb2_height <= bb2_width):
 			
 							print('entered into first if')
-							print(">>>>>>>>>>RRRRRRRRAAAAAAAAAKKKKKKKEEE", min_dist_horizontal)
 							if key in master_keys or vertical_alignment_bbox:
 								merge_flag = (min_dist_horizontal <= eps_horizontal or IOU_horizontal > 0 or inter_percentage > 0) or (
 										min_dist_vertical <= eps_vertical2 or IOU_vertical > 0 or inter_percentage)
