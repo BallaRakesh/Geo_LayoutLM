@@ -170,3 +170,4 @@ single_text_labels = [
 ]
 
 master_keys = ['goods_description']
+

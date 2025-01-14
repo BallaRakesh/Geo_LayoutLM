@@ -364,6 +364,8 @@ def image_to_base64(image_path):
 
 
 
+
+
 def get_geo_result_final(image_base64, file_path, OCR_path):
     # input_json = await req.json()
     # image = input_json.get("image")
@@ -407,11 +409,15 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
         # print(geo_results)
         geo_final_results.extend(geo_results[0])
     # exit('OKKKKKKKKKKKKKKKKKKKKKK')
-    geo_final_result = result_generation(file_path, geo_final_results)
+    geo_final_result = result_generation(file_path, geo_final_results, all_words_)
+    print(file_name)
+    print(geo_final_result)
+
+    
     #result_generation('/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial__/vis/Invoice_405_28_s_1_linking.png', '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results/_tagging.json')
     # return JSONResponse(content=geo_final_result,status_code=200)
 
-
+import time
 if __name__ == '__main__':
     images_path = '/datadrive/geo_data/nakilat_poc/Rotated_inference/Images'
     OCR_path = '/datadrive/geo_data/nakilat_poc/Rotated_inference/OCR'
@@ -419,8 +425,15 @@ if __name__ == '__main__':
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)
     for images_files in os.listdir(images_path):
+        # if images_files not in ['IM-000000016466851-AP_page_0.png']:
+        #     continue
         if not os.path.exists(os.path.join(geo_dump_dir, images_files)):
             image_base64_ = image_to_base64(os.path.join(images_path, images_files))
+            start_time = time.time()
             get_geo_result_final(image_base64_, os.path.join(images_path, images_files), OCR_path)
+            time_taken = time.time() - start_time
+            print(f"TIME TAKEN FOR RESULT GENERATION {time_taken:.2f} seconds.")
         else:
             print(f'File {images_files} already exists.')
+            
+            

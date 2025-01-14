@@ -14,6 +14,12 @@ from scipy.special import softmax
 import torch.nn.functional as F
 from lightning_modules.bros_module import BROSModule
 from utils import get_class_names, cfg_to_hparams, get_specific_pl_logger
+import configparser
+config = configparser.ConfigParser()
+App_Filepath = os.path.dirname(os.path.abspath(__file__))
+config.read(os.path.dirname(App_Filepath) + '/config.ini')
+print(os.path.dirname(App_Filepath) + '/config.ini')
+temperature_value = config['CONFIDENCE_THRESHOLD']['temperature_value']
 
 TOKENIZER = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
 
@@ -126,13 +132,23 @@ def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
 def do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
     bio_class_names = eval_kwargs["bio_class_names"]
     pr_labels = torch.argmax(head_outputs["logits4labeling"], -1)
-    # # Save to JSON file
-    # with open('head_outputs_logits4labeling.txt', 'w') as file:
-    #     file.write(str(head_outputs["logits4labeling"].tolist()))
-    # exit('>>>>>OP')
+    # Calculate confidence scores for each predicted label approch1
+    # probs = F.softmax(head_outputs["logits4labeling"], dim=-1)
+    # confidence_scores = probs.gather(-1, pr_labels.unsqueeze(-1)).squeeze(-1)
+    # print(confidence_scores)
+    
+    # Calculate confidence scores for each predicted label approch2
+    arr = head_outputs["logits4labeling"]  # Assuming this is passed as an array-like object
+    # Original logits from the model
+    logits_ = torch.tensor(arr)
+    # Temperature scaling
+    scaled_logits = logits_ / float(temperature_value)
     # Calculate confidence scores for each predicted label
-    probs = F.softmax(head_outputs["logits4labeling"], dim=-1)
-    confidence_scores = probs.gather(-1, pr_labels.unsqueeze(-1)).squeeze(-1)
+    probs = F.softmax(scaled_logits, dim=-1)
+    pr_labels_confi = torch.argmax(scaled_logits, dim=-1)  # Predicted labels
+    confidence_scores = probs.gather(-1, pr_labels_confi.unsqueeze(-1)).squeeze(-1)
+    # print(confidence_scores)
+    
     gt_str_list, pr_str_list, final_results = eval_ee_bio_batch(
         pr_labels,
         batch["bio_labels"],
