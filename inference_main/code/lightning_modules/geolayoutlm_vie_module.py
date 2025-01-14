@@ -126,6 +126,10 @@ def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
 def do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
     bio_class_names = eval_kwargs["bio_class_names"]
     pr_labels = torch.argmax(head_outputs["logits4labeling"], -1)
+    # # Save to JSON file
+    # with open('head_outputs_logits4labeling.txt', 'w') as file:
+    #     file.write(str(head_outputs["logits4labeling"].tolist()))
+    # exit('>>>>>OP')
     # Calculate confidence scores for each predicted label
     probs = F.softmax(head_outputs["logits4labeling"], dim=-1)
     confidence_scores = probs.gather(-1, pr_labels.unsqueeze(-1)).squeeze(-1)

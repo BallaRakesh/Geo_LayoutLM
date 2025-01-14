@@ -155,13 +155,14 @@ def getitem_geo(image, json_obj, tokenizer, backbone_type):
     sep_bbs_blk = [width, height] * 2
 
     first_token_idx_list = json_obj['blocks']['first_token_idx_list'][:max_block_num]
-    if first_token_idx_list[-1] > len(list_tokens):
-        blk_length = max_block_num
-        for blk_id, first_token_idx in enumerate(first_token_idx_list):
-            if first_token_idx > len(list_tokens):
-                blk_length = blk_id
-                break
-        first_token_idx_list = first_token_idx_list[:blk_length]
+    if len(first_token_idx_list):
+        if first_token_idx_list[-1] > len(list_tokens):
+            blk_length = max_block_num
+            for blk_id, first_token_idx in enumerate(first_token_idx_list):
+                if first_token_idx > len(list_tokens):
+                    blk_length = blk_id
+                    break
+            first_token_idx_list = first_token_idx_list[:blk_length]
         
     first_token_ext = first_token_idx_list + [len(list_tokens) + 1]
     line_id = 1
