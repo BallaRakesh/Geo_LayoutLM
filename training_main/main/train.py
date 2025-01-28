@@ -6,7 +6,7 @@ from pytorch_lightning.utilities.seed import seed_everything
 from lightning_modules.data_modules.vie_data_module import VIEDataModule
 from lightning_modules.geolayoutlm_vie_module import GeoLayoutLMVIEModule
 from utils import get_callbacks, get_config, get_loggers, get_plugins
-
+# from pytorch_lightning.callbacks import TQDMProgressBar
 
 def main():
     cfg = get_config('configs/finetune_funsd.yaml')
@@ -18,6 +18,8 @@ def main():
     callbacks = get_callbacks(cfg)
     plugins = get_plugins(cfg)
     loggers = get_loggers(cfg)
+    # In your get_callbacks function or where you define callbacks:
+    # callbacks.append(TQDMProgressBar(refresh_rate=1))
 
     trainer = Trainer(
         accelerator=cfg.train.accelerator,
@@ -33,6 +35,7 @@ def main():
         replace_sampler_ddp=False,
         move_metrics_to_cpu=False,
         progress_bar_refresh_rate=0,
+        # enable_progress_bar=True,
         check_val_every_n_epoch=cfg.train.val_interval,
         logger=loggers,
         benchmark=cfg.cudnn_benchmark,

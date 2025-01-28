@@ -1,10 +1,10 @@
 # For workspace name
 # The checkpoint file location to be saved: {workspace}/checkpoints/
 # The log file location to be saved: {workspace}/tensorboard_logs/
-workspace: /home/data_science/geo_testing/geo_data/results/custom_trial
+workspace: /datadrive/rakesh/TradeFinanceData/PO/PO_root/results/custom_trial
 
 dataset: custom
-dataset_root_path: /home/data_science/geo_testing/geo_data/dataset
+dataset_root_path: /datadrive/rakesh/TradeFinanceData/PO/PO_root/data_in_funsd_format/dataset
 task: ee_el
 img_h: 768
 img_w: 768
@@ -17,7 +17,7 @@ model:
   #n_classes: 40
   backbone: alibaba-damo/geolayoutlm-large-uncased
   config_json: ./configs/GeoLayoutLM/GeoLayoutLM_large_model_config.json
-  model_ckpt: /home/data_science/geo_testing/Geo_LayoutLM/training_main/main/geolayoutlm_large_pretrain.pt #geolayoutlm_large_pretrain #epoch=12-f1_labeling=0.9070.pt #epoch=23-f1_labeling=0.9318.pt
+  model_ckpt: /datadrive/rakesh/TradeFinanceData/geolayoutlm_large_pretrain.pt
   head: vie
   use_inner_id: true
   max_prob_as_father: true
@@ -25,7 +25,7 @@ model:
 
 train:
   batch_size: 1
-  num_samples_per_epoch: 320
+  num_samples_per_epoch: 300
   max_seq_length: 512
   max_block_num: 150
   max_epochs: 50

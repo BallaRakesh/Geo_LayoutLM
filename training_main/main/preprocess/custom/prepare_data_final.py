@@ -364,5 +364,5 @@ def gen_data_in_funsd_format(root_path):
             
 
 if __name__ == "__main__":
-    ROOT_PATH = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Train_data/PI/PI_Train"
+    ROOT_PATH = "/datadrive/rakesh/TradeFinanceData/PO/PO_root"
     gen_data_in_funsd_format(ROOT_PATH)
