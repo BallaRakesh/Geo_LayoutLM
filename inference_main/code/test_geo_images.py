@@ -421,8 +421,8 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/Ingram_POC_Samples/Images'
-    OCR_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/Ingram_POC_Samples/OCR'
+    images_path = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Eval_data/CI/v2/Images'
+    OCR_path = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Eval_data/CI/v2/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)

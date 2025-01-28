@@ -16,17 +16,17 @@ from fuzzywuzzy import fuzz
 import ast
 
 #  source /datadrive/khushal/idp39/bin/activate
-idp_inv_images_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Images"
-idp_inv_labels_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/Labels"
-idp_inv_ocr_folder = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/OCR"
-classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/class_names.txt"
-annot_classses_file = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/label.txt" 
-idp_inv_json_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter3/final_results"
-idp_inv_image_results = "/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter2/reports__nov6"
+idp_inv_images_folder = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/Images"
+idp_inv_labels_folder = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/Labels"
+idp_inv_ocr_folder = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/OCR"
+classes_path = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/class_names.txt"
+annot_classses_file = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/label.txt" 
+idp_inv_json_results = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/final_results"
+idp_inv_image_results = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/reports__nov6"
 csv_file_path = './Inv_geo_OUTPUT_nov6__'
 plot_gt_flag = False
 idp_model_type = "GEOlayoutLMVForTokenClassification"
-
+itf_ocr = True
 
 
 
@@ -447,8 +447,8 @@ def detect(save_csv=False):
         total_pred_labels = 0 ; total_actual_labels = 0
 
         for file in os.listdir(idp_inv_images_folder):
-            if file not in ["571581_Invoice_page_0.png"]: #["IM-000000010965506-AP_page_1.png"]:
-                continue
+            # if file not in ["571581_Invoice_page_0.png"]: #["IM-000000010965506-AP_page_1.png"]:
+            #     continue
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
             print('file:', file)
             print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
@@ -483,8 +483,11 @@ def detect(save_csv=False):
             # print("label_data : ", label_data)
 
             # for label_info in label_data: total_actual_labels += 1
-
-            ocr_data = read_ocr_data(f"{os.path.basename(img_path)[:-4]}_textAndCoordinates.txt")
+            if itf_ocr:
+                ocr_data = read_ocr_data(f"{os.path.basename(img_path)[:-4]}_text.txt")
+                ocr_data = ocr_data.get('word_coordinates', [])
+            else:
+                ocr_data = read_ocr_data(f"{os.path.basename(img_path)[:-4]}_textAndCoordinates.txt")
             print("ocr_data : ", type(ocr_data))
 
             if ocr_data is None: exit()
@@ -497,6 +500,8 @@ def detect(save_csv=False):
             
             cls_to_delete = set()
             for xyxy, cls, cnf, idp_predicted_value in pred:
+                print('$$$$$$$$$$$')
+                print(xyxy, cls, cnf, idp_predicted_value)
                 if cls != "O":
                     cls = cls[2:]
                 print("#"*60)
@@ -585,10 +590,10 @@ def detect(save_csv=False):
                 for actual_value_left_str in actual_box_left:
                     cls_ = anno_idx2label[class_id]
                     fuzzScore = 0 # calculate_fuzzy_score(actual_value_str['words'], "", cls_)
-                csv_writer.writerow([file, cls_, actual_value_left_str['words'], "N/A", fuzzScore, "N/A", 0, actual_value_left_str['bbox'], "(0,0,0,0)", 0])
+                    csv_writer.writerow([file, cls_, actual_value_left_str['words'], "N/A", fuzzScore, "N/A", 0, actual_value_left_str['bbox'], "(0,0,0,0)", 0]) #actual change 1
         print("###################################################")
-        print("No. of Actual Labels :", total_actual_labels)
-        print("No. of Predictions   :", total_pred_labels)
+        print("No. of Actual Labels :", total_actual_labels) 
+        print("No. of Predictions   :", total_pred_labels) 
         precision_pt = 4
         print("Precision (fuzz>=25)  :", round(fuzz25_correct_preds/total_pred_labels,precision_pt))
         print("Precision (fuzz>=50)  :", round(fuzz50_correct_preds/total_pred_labels,precision_pt))

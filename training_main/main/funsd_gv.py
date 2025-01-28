@@ -52,6 +52,6 @@ def gen_custom_data(root_path, ocr_file):
             
 
 if __name__ == "__main__":
-    OCR_PATH = '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/OCR'
-    ROOT_PATH = '/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data'
+    OCR_PATH = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Train_data/PI/PI_Train/OCR'
+    ROOT_PATH = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Train_data/PI/PI_Train'
     gen_custom_data(ROOT_PATH, OCR_PATH)

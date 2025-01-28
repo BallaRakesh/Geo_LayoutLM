@@ -171,8 +171,8 @@ def save_class_names():
 
 
 if __name__ == "__main__":
-    classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/label.txt"
-    INPUT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/data_in_funsd_format"
+    classes_path = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Train_data/PI/PI_root/label.txt"
+    INPUT_PATH = "/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Train_data/PI/PI_root/data_in_funsd_format"
     
     data_folder = INPUT_PATH #'/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
     

@@ -12,16 +12,17 @@ VOCA = "bert-base-uncased"
 
 CLASSES = ["O", "HEADER", "QUESTION", "ANSWER"]
 CLASSES_VALID = ["HEADER", "QUESTION", "ANSWER"]
-INPUT_PATH = "/home/gayathri/g3/funsd/dataset"
-anno_dir = 'annotations'
+
+# INPUT_PATH = "/home/gayathri/g3/funsd/dataset"
+# anno_dir = 'annotations'
 # if not os.path.exists(INPUT_PATH):
 #     os.system("wget https://guillaumejaume.github.io/FUNSD/dataset.zip")
 #     os.system("unzip dataset.zip")
 #     os.system("rm -rf dataset.zip __MACOSX")
 
-OUTPUT_PATH = "../../dataset/funsd_geo"
-os.makedirs(OUTPUT_PATH, exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_PATH, "preprocessed"), exist_ok=True)
+# OUTPUT_PATH = "../../dataset/funsd_geo"
+# os.makedirs(OUTPUT_PATH, exist_ok=True)
+# os.makedirs(os.path.join(OUTPUT_PATH, "preprocessed"), exist_ok=True)
 
 
 def main():
