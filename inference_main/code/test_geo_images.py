@@ -419,8 +419,8 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/datadrive/geo_data/nakilat_poc/Rotated_inference/Images'
-    OCR_path = '/datadrive/geo_data/nakilat_poc/Rotated_inference/OCR'
+    images_path = '/home/gpu1admin/rakesh/temp_geo_infer/data/Images'
+    OCR_path = '/home/gpu1admin/rakesh/Geo_LayoutLM/temp_fol_v1/ocr'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)

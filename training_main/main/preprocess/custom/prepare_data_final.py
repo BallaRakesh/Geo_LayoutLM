@@ -364,5 +364,5 @@ def gen_data_in_funsd_format(root_path):
             
 
 if __name__ == "__main__":
-    ROOT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data"
+    ROOT_PATH = "/datadrive/rakesh/TradeFinanceData/PO/PO_root"
     gen_data_in_funsd_format(ROOT_PATH)

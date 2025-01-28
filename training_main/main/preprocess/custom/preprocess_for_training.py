@@ -59,7 +59,8 @@ def do_preprocess(tokenizer, dataset_split):
             form_id = form["id"]
             form_text = form["text"].strip()
             form_label = form["label"]
-            if form_label.startswith('O') or form_label.startswith('o'):
+            # if form_label.startswith('O') or form_label.startswith('o'):
+            if form_label.lower() == 'other':
                 form_label = "O"
             form_linking = form["linking"]
             form_box = form["box"]
@@ -171,9 +172,8 @@ def save_class_names():
 
 
 if __name__ == "__main__":
-    classes_path = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/label.txt"
-    INPUT_PATH = "/home/ntlpt19/Desktop/TF_release/geolm_api/Data_handover_geo/Train_Data/data_in_funsd_format"
-    
+    classes_path = "/datadrive/rakesh/TradeFinanceData/PO/PO_root/label.txt"
+    INPUT_PATH = "/datadrive/rakesh/TradeFinanceData/PO/PO_root/data_in_funsd_format"
     data_folder = INPUT_PATH #'/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
     
     with open(classes_path, 'r') as f:
