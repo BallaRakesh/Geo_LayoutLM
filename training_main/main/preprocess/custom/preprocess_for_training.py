@@ -172,8 +172,8 @@ def save_class_names():
 
 
 if __name__ == "__main__":
-    classes_path = "/datadrive/rakesh/TradeFinanceData/PO/PO_root/label.txt"
-    INPUT_PATH = "/datadrive/rakesh/TradeFinanceData/PO/PO_root/data_in_funsd_format"
+    classes_path = "/datadrive/rakesh/TradeFinanceData/COO/COO_root/label.txt"
+    INPUT_PATH = "/datadrive/rakesh/TradeFinanceData/COO/COO_root/data_in_funsd_format"
     data_folder = INPUT_PATH #'/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
     
     with open(classes_path, 'r') as f:
