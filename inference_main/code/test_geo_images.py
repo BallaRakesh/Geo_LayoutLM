@@ -396,8 +396,6 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     print(pre_data1)
 
 
-
-
     geo_final_results = []
     for data_ in pre_data1:
         print('>>>>>>>>>>>>>>>>>>')
@@ -408,7 +406,7 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
-
+        # print(geo_results)
         geo_final_results.extend(geo_results[0])
     # exit('OKKKKKKKKKKKKKKKKKKKKKK')
     geo_final_result = result_generation(file_path, geo_final_results, all_words_)
@@ -421,8 +419,8 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/Ingram_POC_Samples/Images'
-    OCR_path = '/home/ntlpt19/Desktop/TF_release/geolm_api/Ingram_POC_Samples/OCR'
+    images_path = '/datadrive/rakesh/TradeFinanceData/COO/COO_eval/Images'
+    OCR_path = '/datadrive/rakesh/TradeFinanceData/COO/COO_eval/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)

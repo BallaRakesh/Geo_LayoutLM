@@ -63,7 +63,8 @@ class VIEDataset(Dataset):
         # exit('+++++++++++++++++')
         self.bio_class_names = ["O"]
         for class_name in self.class_names:
-            if not class_name.startswith('O'):
+            # if not class_name.startswith('O'):
+            if class_name.upper() != 'O':
                 self.bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
         self.bio_class_idx_dic = dict(
             [
@@ -396,7 +397,8 @@ class VIEDatasetInfer(Dataset):
         # exit('+++++++++++++++++')
         self.bio_class_names = ["O"]
         for class_name in self.class_names:
-            if not class_name.startswith('O'):
+            # if not class_name.startswith('O'):
+            if class_name.upper() != 'O':
                 self.bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
         self.bio_class_idx_dic = dict(
             [

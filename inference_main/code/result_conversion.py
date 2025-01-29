@@ -53,8 +53,8 @@ def process_files_in_folder(input_folder, output_folder):
 
 # Main function to specify input/output folders
 def main():
-    input_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/results'
-    output_folder = '/home/ntlpt19/Desktop/TF_release/geolm_api/grasim_test_samples/itter5/final_results'
+    input_folder = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/Results'
+    output_folder = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/CI_verified_annotations/Eval_data/final_results'
     os.makedirs(output_folder, exist_ok=True)
     process_files_in_folder(input_folder, output_folder)
 

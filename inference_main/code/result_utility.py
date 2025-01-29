@@ -39,7 +39,8 @@ def get_eval_kwargs_geolayoutlm_vie(geo_clsses_path):
     class_names = get_class_names(geo_clsses_path)
     bio_class_names = ["O"]
     for class_name in class_names:
-        if not class_name.startswith('O'):
+        # if not class_name.startswith('O'):
+        if class_name.upper() != 'O':
             bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
     eval_kwargs = {
         "bio_class_names": bio_class_names,
@@ -155,13 +156,14 @@ def getitem_geo(image, json_obj, tokenizer, backbone_type):
     sep_bbs_blk = [width, height] * 2
 
     first_token_idx_list = json_obj['blocks']['first_token_idx_list'][:max_block_num]
-    if first_token_idx_list[-1] > len(list_tokens):
-        blk_length = max_block_num
-        for blk_id, first_token_idx in enumerate(first_token_idx_list):
-            if first_token_idx > len(list_tokens):
-                blk_length = blk_id
-                break
-        first_token_idx_list = first_token_idx_list[:blk_length]
+    if len(first_token_idx_list):
+        if first_token_idx_list[-1] > len(list_tokens):
+            blk_length = max_block_num
+            for blk_id, first_token_idx in enumerate(first_token_idx_list):
+                if first_token_idx > len(list_tokens):
+                    blk_length = blk_id
+                    break
+            first_token_idx_list = first_token_idx_list[:blk_length]
         
     first_token_ext = first_token_idx_list + [len(list_tokens) + 1]
     line_id = 1

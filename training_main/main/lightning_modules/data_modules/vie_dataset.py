@@ -59,7 +59,8 @@ class VIEDataset(Dataset):
 
         self.bio_class_names = ["O"]
         for class_name in self.class_names:
-            if not class_name.startswith('O'):
+            # if not class_name.startswith('O'):
+            if class_name.upper() != 'O':
                 self.bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
         self.bio_class_idx_dic = dict(
             [
@@ -94,7 +95,7 @@ class VIEDataset(Dataset):
         height = json_obj["meta"]["imageSize"]["height"]
 
         img_path = os.path.join(self.dataset_root_path, json_obj["meta"]["image_path"])
-        # print('>>>>>>>>>>>>> this is image path ###', img_path)
+        print('>>>>>>>>>>>>> this is image path ###', img_path)
         image = cv2.resize(cv2.imread(img_path, 1), (self.img_w, self.img_h))
         image = image.astype("float32").transpose(2, 0, 1)
 
@@ -365,7 +366,8 @@ class VIEDatasetInference(Dataset):
 
         self.bio_class_names = ["O"]
         for class_name in self.class_names:
-            if not class_name.startswith('O'):
+            # if not class_name.startswith('O'):
+            if class_name.upper() != 'O':
                 self.bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
         self.bio_class_idx_dic = dict(
             [
