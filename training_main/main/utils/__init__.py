@@ -6,9 +6,10 @@ from omegaconf import OmegaConf
 from omegaconf.dictconfig import DictConfig
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
-from pytorch_lightning.plugins import DDPPlugin
+# from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.strategies import DDPStrategy
 
-num_classes=31
+num_classes=6
 #/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/geolayoutlm_code_base_2/configs/val_config.yml
 def get_config(default_conf_file="./configs/val_config.yml"):
     cfg = OmegaConf.load(default_conf_file)
@@ -92,7 +93,7 @@ class CustomModelCheckpoint(ModelCheckpoint):
     def on_train_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
         """Save a checkpoint at the end of the training epoch."""
         # as we advance one step at end of training, we use `global_step - 1` to avoid saving duplicates
-        trainer.fit_loop.global_step -= 1
+        # trainer.fit_loop.global_step -= 1
         if (
             not self._should_skip_saving_checkpoint(trainer)
             and self._save_on_train_epoch_end
@@ -100,7 +101,7 @@ class CustomModelCheckpoint(ModelCheckpoint):
             and (trainer.current_epoch + 1) % self._every_n_epochs == 0
         ):
             self.save_checkpoint(trainer)
-        trainer.fit_loop.global_step += 1
+        # trainer.fit_loop.global_step += 1
 
 
 def get_plugins(cfg):

@@ -95,7 +95,7 @@ class VIEDataset(Dataset):
         height = json_obj["meta"]["imageSize"]["height"]
 
         img_path = os.path.join(self.dataset_root_path, json_obj["meta"]["image_path"])
-        print('>>>>>>>>>>>>> this is image path ###', img_path)
+        # print('>>>>>>>>>>>>> this is image path ###', img_path)
         image = cv2.resize(cv2.imread(img_path, 1), (self.img_w, self.img_h))
         image = image.astype("float32").transpose(2, 0, 1)
 

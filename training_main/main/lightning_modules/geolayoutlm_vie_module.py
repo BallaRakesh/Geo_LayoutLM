@@ -6,7 +6,9 @@ import numpy as np
 import torch
 import torch.utils.data
 from overrides import overrides
-from pytorch_lightning.utilities.distributed import rank_zero_only
+# from pytorch_lightning.utilities.distributed import rank_zero_only
+from lightning_fabric.utilities.rank_zero import rank_zero_only
+
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 from seqeval.metrics import f1_score, precision_score, recall_score
 from transformers import BertTokenizer
@@ -17,9 +19,11 @@ from utils import get_class_names, cfg_to_hparams, get_specific_pl_logger
 TOKENIZER = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
 
 class GeoLayoutLMVIEModule(BROSModule):
+    
     def __init__(self, cfg):
         super().__init__(cfg)
-
+        self.validation_step_outputs = []
+        self.training_step_outputs = []
         class_names = get_class_names(self.cfg.dataset_root_path)
         bio_class_names = ["O"]
         for class_name in class_names:
@@ -56,15 +60,19 @@ class GeoLayoutLMVIEModule(BROSModule):
             "loss_labeling": loss_dict["labeling_loss"].detach(), 
             "loss_linking": loss_dict["linking_loss"].detach(),
         }
+        self.training_step_outputs.append(ret_loss)
         return ret_loss
 
     @overrides
-    def training_epoch_end(self, training_step_outputs):
+    # def training_epoch_end(self, training_step_outputs):
+    def on_train_epoch_end(self):
         avg_loss = torch.tensor(0.0).to(self.device)
         avg_labeling_loss = torch.tensor(0.0).to(self.device)
         avg_linking_loss = torch.tensor(0.0).to(self.device)
-        n_outputs = max(1, len(training_step_outputs))
-        for step_out in training_step_outputs:
+        # n_outputs = max(1, len(training_step_outputs))
+        n_outputs = max(1, len(self.training_step_outputs))
+        # for step_out in training_step_outputs:
+        for step_out in self.training_step_outputs:
             avg_loss += step_out["loss"]
             avg_labeling_loss += step_out["loss_labeling"]
             avg_linking_loss += step_out["loss_linking"]
@@ -75,7 +83,8 @@ class GeoLayoutLMVIEModule(BROSModule):
             "linking_loss": avg_linking_loss / n_outputs
         }
         self._log_shell(log_dict, prefix="train ")
-
+        self.training_step_outputs.clear()
+        
     @rank_zero_only
     @overrides
     def on_fit_end(self):
@@ -95,12 +104,14 @@ class GeoLayoutLMVIEModule(BROSModule):
     def validation_step(self, batch, batch_idx, *args):
         head_outputs, loss_dict = self.net(batch)
         step_out = do_eval_step(batch, head_outputs, loss_dict, self.eval_kwargs)
+        self.validation_step_outputs.append(step_out)
         return step_out
 
     @torch.no_grad()
     @overrides
-    def validation_epoch_end(self, validation_step_outputs):
-        scores = do_eval_epoch_end(validation_step_outputs)
+    # def validation_epoch_end(self, validation_step_outputs):
+    def on_validation_epoch_end(self):
+        scores = do_eval_epoch_end(self.validation_step_outputs)
         for task_name, score_task in scores.items():
             self.f1_res[f'f1_{task_name}'] = score_task['f1']
             suffix = ''
@@ -112,6 +123,8 @@ class GeoLayoutLMVIEModule(BROSModule):
             )
         self.f1_res['f1_all'] = self.f1_res['f1_labeling'] + self.f1_res['f1_linking']
         self.log_dict(self.f1_res)
+        # free memory
+        self.validation_step_outputs.clear()
 
 
 def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):

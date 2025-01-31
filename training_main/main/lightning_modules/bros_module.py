@@ -5,7 +5,8 @@ import torch.utils.data
 from overrides import overrides
 from pytorch_lightning import LightningModule
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
-from pytorch_lightning.utilities.distributed import rank_zero_only
+# from pytorch_lightning.utilities.distributed import rank_zero_only
+from lightning_fabric.utilities.rank_zero import rank_zero_only
 from torch.optim import SGD, Adam, AdamW
 from torch.optim.lr_scheduler import LambdaLR
 
@@ -111,15 +112,19 @@ class BROSModule(LightningModule):
             out_str += f" || {key}: {round(value, 5)}"
         
         if self.training:
-            lr = self.trainer._lightning_optimizers[0].param_groups[0]["lr"]
+            # lr = self.trainer._lightning_optimizers[0].param_groups[0]["lr"]
+            # out_str += f" || lr: {lr:.1e}"
+            lr = self.trainer.strategy._lightning_optimizers[0].param_groups[0]["lr"]
             out_str += f" || lr: {lr:.1e}"
+            
             # lr2 = self.trainer._lightning_optimizers[0].param_groups[1]["lr"]
             # out_str += f" || lr2: {lr2:.1e}"
 
         t_epoch = round(time.time() - self.time_tracker, 1)
         t_total = (time.time() - self.time0) / 60
         out_str += f" || (epoch/total) time: {t_epoch} s / {t_total:.1f} min."
-        self.print(out_str, flush=True)
+        # self.print(out_str, flush=True)
+        self.print(out_str)
         self.time_tracker = time.time()
 
 

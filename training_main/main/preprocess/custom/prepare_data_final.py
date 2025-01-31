@@ -364,5 +364,5 @@ def gen_data_in_funsd_format(root_path):
             
 
 if __name__ == "__main__":
-    ROOT_PATH = "/datadrive/rakesh/TradeFinanceData/COO/COO_root"
+    ROOT_PATH = "/datadrive/aryan_poc"
     gen_data_in_funsd_format(ROOT_PATH)
