@@ -422,7 +422,7 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/BOL'
+    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/CI'
     OCR_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
