@@ -52,6 +52,6 @@ def gen_custom_data(root_path, ocr_file):
             
 
 if __name__ == "__main__":
-    OCR_PATH = '/datadrive/rakesh/TradeFinanceData/PO/PO_root/OCR'
-    ROOT_PATH = '/datadrive/rakesh/TradeFinanceData/PO/PO_root'
+    OCR_PATH = '/datadrive/rakesh/TradeFinanceData/COO/COO_root/OCR'
+    ROOT_PATH = '/datadrive/rakesh/TradeFinanceData/COO/COO_root'
     gen_custom_data(ROOT_PATH, OCR_PATH)

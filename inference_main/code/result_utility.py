@@ -39,7 +39,8 @@ def get_eval_kwargs_geolayoutlm_vie(geo_clsses_path):
     class_names = get_class_names(geo_clsses_path)
     bio_class_names = ["O"]
     for class_name in class_names:
-        if not class_name.startswith('O'):
+        # if not class_name.startswith('O'):
+        if class_name.upper() != 'O':
             bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
     eval_kwargs = {
         "bio_class_names": bio_class_names,
