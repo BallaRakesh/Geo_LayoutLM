@@ -171,9 +171,24 @@ def save_class_names():
         fp.write("\n".join(CLASSES))
 
 
+import argparse
 if __name__ == "__main__":
-    classes_path = "/datadrive/rakesh/TradeFinanceData/COO/COO_root/label.txt"
-    INPUT_PATH = "/datadrive/rakesh/TradeFinanceData/COO/COO_root/data_in_funsd_format"
+    parser = argparse.ArgumentParser(description="Custom Data Generation Script")
+    parser.add_argument(
+        "--root_path",
+        default = '/',
+        help="Root directory path",
+        type=str,
+        required=False,
+    )
+    args = parser.parse_args()
+    
+    ROOT_PATH = args.root_path
+    # ROOT_PATH = ''
+    classes_path = os.path.join(ROOT_PATH, 'label.txt')
+    INPUT_PATH = os.path.join(ROOT_PATH, 'data_in_funsd_format')
+    
+    # INPUT_PATH = "/root/rakesh/data/BOE/data_in_funsd_format"
     data_folder = INPUT_PATH #'/home/gpu1admin/rakesh/ingram_rakesh_data/data_in_funsd_format'
     
     with open(classes_path, 'r') as f:
