@@ -386,15 +386,19 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     # # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
     # img_path = os.path.join(img_path, file_name)
     file_name = os.path.basename(file_path)
-    ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
-    if not os.path.exists(os.path.join(OCR_path,ocr_file)):
-        ocr_file = file_name.replace('.png', '_text.txt')
+    print(file_name)
+    if '.png' in file_name:
+        ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
+        if not os.path.exists(os.path.join(OCR_path,ocr_file)):
+            ocr_file = file_name.replace('.png', '_text.txt')
+    if '.jpg' in file_name:
+        ocr_file = file_name.replace('.jpg', '_textAndCoordinates.txt')
+        if not os.path.exists(os.path.join(OCR_path,ocr_file)):
+            ocr_file = file_name.replace('.jpg', '_text.txt')
     # with open(all_words_path, 'r') as file:
     #     all_words_ = json.load(file)
     all_words_ = gv_data(file_path, ocr_file = os.path.join(OCR_path,ocr_file))
     pre_data1 = main(all_words_)
-    print(pre_data1)
-
 
     geo_final_results = []
     for data_ in pre_data1:
@@ -402,7 +406,6 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
         print('>>>>>>>>>>>>>>>>>>')
         # print(data_['form'])
         out_json_obj = preprocessData(data_['form'], file_path)
-        print(out_json_obj)
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
@@ -419,8 +422,8 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/gpu1admin/rakesh/temp_geo_infer/data/Images'
-    OCR_path = '/home/gpu1admin/rakesh/Geo_LayoutLM/temp_fol_v1/ocr'
+    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/BOL'
+    OCR_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)
