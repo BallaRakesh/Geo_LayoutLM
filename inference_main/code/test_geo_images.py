@@ -53,7 +53,7 @@ import uvicorn
 from fastapi import FastAPI,Request
 from io import BytesIO
 import base64
-
+from model_saving_eval_mode import save_loaded_model
 
 
 
@@ -67,12 +67,7 @@ MODEL_PATH = config['PATH']['MODEL_PATH']
 
 
 
-def load_model_weight(net, device_m):#, pretrained_model_file):
-    #grasim
-    # pretrained_model_file = MODEL_PATH #'/datadrive/geo_data/root/results/custom_trial/checkpoints/epoch=8-f1_labeling=0.9643.pt'
-    #ingram
-    # pretrained_model_file = '/datadrive/rakesh/epoch=10-f1_labeling=0.9647.pt'
-    
+def load_model_weight(net, device_m): 
     print("Loading ckpt from:", MODEL_PATH)
     pretrained_model_state_dict = torch.load(MODEL_PATH, map_location=device_m)
     print("HERE")
@@ -102,7 +97,6 @@ from lightning_modules.geolayoutlm_vie_module import (
     do_eval_step
 )
 eval_kwargs = get_eval_kwargs_geolayoutlm_vie(geo_clsses_path)
-
 
 
 
@@ -137,6 +131,9 @@ def load_model():
     net.to(device)
     # Set model to evaluation mode
     net.eval()
+    # save_loaded_model(net, '/media/ntlpt19/5250315B5031474F/TradeFinance_Geo/eval_mode_save', filename = pt_filename)
+    # exit('>>>>>>>>.')
+    
     # If you need the device the model is on, you can still check it
     # current_device = next(net.parameters()).device
     # print(f"Model is on device: {current_device}")
@@ -422,7 +419,7 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/CI'
+    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/CI/img'
     OCR_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
