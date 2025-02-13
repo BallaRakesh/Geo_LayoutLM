@@ -1,4 +1,127 @@
 
+
+import torch
+import os
+import torch
+import os
+
+
+def save_loaded_model(net, save_path, filename="model_eval.pth"):
+    """
+    Save an already loaded model in eval mode.
+    
+    Args:
+        net: The loaded PyTorch model
+        save_path: Directory to save the model
+        filename: Name of the saved model file
+    """
+    # Create save directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+    
+    # Ensure model is in eval mode
+    net.eval()
+    
+    # Full path for saving
+    full_save_path = os.path.join(save_path, filename)
+    
+    # Create save dictionary with model state and metadata
+    save_dict = {
+        "state_dict": net.state_dict(),
+        "eval_mode": True
+    }
+    
+    # Save the model
+    torch.save(save_dict, full_save_path)
+    print(f"Model saved in eval mode at: {full_save_path}")
+
+# Example usage with your existing code:
+def process_and_save_model(geo_cfg, device, model_path, save_path):
+    """
+    Load model and save it in eval mode
+    """
+    # Your existing loading code
+    net = get_model(geo_cfg)
+    load_model_weight(net, device)
+    net.to(device)
+    net.eval()
+    
+    # Save the loaded model
+    save_loaded_model(net, save_path)
+    
+    return net
+
+
+import torch
+
+def load_saved_eval_model(net, model_path, device):
+    """
+    Load a model that was saved in eval mode.
+    
+    Args:
+        net: Initial model instance
+        model_path: Path to the saved model
+        device: Device to load the model on
+    Returns:
+        Loaded model in eval mode
+    """
+    print(f"Loading model from: {model_path}")
+    
+    # Load the checkpoint
+    checkpoint = torch.load(model_path, map_location=device)
+    
+    # Get state dict based on save format
+    if isinstance(checkpoint, dict):
+        if "state_dict" in checkpoint:
+            state_dict = checkpoint["state_dict"]
+        else:
+            state_dict = checkpoint
+    else:
+        state_dict = checkpoint
+        
+    # Process state dict keys (keeping your original logic)
+    new_state_dict = {}
+    valid_keys = net.state_dict().keys()
+    invalid_keys = []
+    
+    for k, v in state_dict.items():
+        new_k = k
+        if new_k.startswith("net."):
+            new_k = new_k[len("net."):]
+        
+        if new_k in valid_keys:
+            new_state_dict[new_k] = v
+        else:
+            invalid_keys.append(new_k)
+    
+    if invalid_keys:
+        print(f"These keys are invalid in the checkpoint: [{','.join(invalid_keys)}]")
+    
+    # Load the processed state dict
+    net.load_state_dict(new_state_dict)
+    
+    # Move to device and set eval mode
+    net = net.to(device)
+    net.eval()
+    
+    print("Model loaded successfully in eval mode")
+    return net
+
+# Example usage with complete pipeline
+def get_inference_model(geo_cfg, device, model_path):
+    """
+    Complete pipeline to load saved model for inference
+    """
+    # Initialize model
+    net = get_model(geo_cfg)
+    
+    # Load the saved weights
+    net = load_saved_eval_model(net, model_path, device)
+    
+    return net
+
+exit('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+
+
 import os
 import shutil
 from fuzzywuzzy import fuzz
