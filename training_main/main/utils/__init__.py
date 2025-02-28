@@ -8,12 +8,13 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers.tensorboard import TensorBoardLogger
 # from pytorch_lightning.plugins import DDPPlugin
 from pytorch_lightning.strategies import DDPStrategy
+from constants import root_path, model_ckpt_path
 
-num_classes=6
+# num_classes=6
+# num_classes=41
 #/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/geolayoutlm_code_base_2/configs/val_config.yml
 def get_config(default_conf_file="./configs/val_config.yml"):
     cfg = OmegaConf.load(default_conf_file)
-
     cfg_cli = _get_config_from_cli()
     if "config" in cfg_cli:
         cfg_cli_config = OmegaConf.load(cfg_cli.config)
@@ -39,11 +40,17 @@ def _get_config_from_cli():
 
 
 def _update_config(cfg):
+    with open(os.path.join(root_path, 'label.txt'), "r", encoding="utf-8") as file:
+        labels = [line.strip() for line in file]
+    num_classes = len(labels)
     # if os.path.exists(cfg.workspace):
     #     cfg.workspace = cfg.workspace.rstrip('/') + '_' + datetime.datetime.now().strftime('%m%d%H%M')
+    cfg.workspace = os.path.join(root_path,'results/custom_trial')
     cfg.save_weight_dir = os.path.join(cfg.workspace, "checkpoints")
+    print(cfg.save_weight_dir)
     cfg.tensorboard_dir = os.path.join(cfg.workspace, "tensorboard_logs")
-
+    cfg.dataset_root_path = os.path.join(root_path, 'data_in_funsd_format/dataset')
+    cfg.model.model_ckpt = model_ckpt_path
     if cfg.dataset == "funsd":
         cfg.dataset_root_path = os.path.join(cfg.dataset_root_path, "funsd_geo")
         cfg.model.n_classes = 7

@@ -50,8 +50,19 @@ def gen_custom_data(root_path, ocr_file):
         with open(file_name, "w") as json_file:
             json.dump(final, json_file)
             
-
+import argparse
 if __name__ == "__main__":
-    OCR_PATH = '/datadrive/aryan_poc/OCR'
-    ROOT_PATH = '/datadrive/aryan_poc'
+    parser = argparse.ArgumentParser(description="Custom Data Generation Script")
+    parser.add_argument(
+        "--root_path",
+        default = '/',
+        help="Root directory path",
+        type=str,
+        required=False,
+    )
+    args = parser.parse_args()
+    
+    ROOT_PATH = args.root_path
+    # ROOT_PATH = '/root/rakesh/data/BOE'
+    OCR_PATH = os.path.join(ROOT_PATH, 'OCR')
     gen_custom_data(ROOT_PATH, OCR_PATH)

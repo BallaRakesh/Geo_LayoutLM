@@ -53,7 +53,7 @@ import uvicorn
 from fastapi import FastAPI,Request
 from io import BytesIO
 import base64
-
+from model_saving_eval_mode import save_loaded_model
 
 
 
@@ -67,12 +67,7 @@ MODEL_PATH = config['PATH']['MODEL_PATH']
 
 
 
-def load_model_weight(net, device_m):#, pretrained_model_file):
-    #grasim
-    # pretrained_model_file = MODEL_PATH #'/datadrive/geo_data/root/results/custom_trial/checkpoints/epoch=8-f1_labeling=0.9643.pt'
-    #ingram
-    # pretrained_model_file = '/datadrive/rakesh/epoch=10-f1_labeling=0.9647.pt'
-    
+def load_model_weight(net, device_m): 
     print("Loading ckpt from:", MODEL_PATH)
     pretrained_model_state_dict = torch.load(MODEL_PATH, map_location=device_m)
     print("HERE")
@@ -102,7 +97,6 @@ from lightning_modules.geolayoutlm_vie_module import (
     do_eval_step
 )
 eval_kwargs = get_eval_kwargs_geolayoutlm_vie(geo_clsses_path)
-
 
 
 
@@ -137,6 +131,9 @@ def load_model():
     net.to(device)
     # Set model to evaluation mode
     net.eval()
+    # save_loaded_model(net, '/media/ntlpt19/5250315B5031474F/TradeFinance_Geo/eval_mode_save', filename = pt_filename)
+    # exit('>>>>>>>>.')
+    
     # If you need the device the model is on, you can still check it
     # current_device = next(net.parameters()).device
     # print(f"Model is on device: {current_device}")
@@ -386,15 +383,19 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     # # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
     # img_path = os.path.join(img_path, file_name)
     file_name = os.path.basename(file_path)
-    ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
-    if not os.path.exists(os.path.join(OCR_path,ocr_file)):
-        ocr_file = file_name.replace('.png', '_text.txt')
+    print(file_name)
+    if '.png' in file_name:
+        ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
+        if not os.path.exists(os.path.join(OCR_path,ocr_file)):
+            ocr_file = file_name.replace('.png', '_text.txt')
+    if '.jpg' in file_name:
+        ocr_file = file_name.replace('.jpg', '_textAndCoordinates.txt')
+        if not os.path.exists(os.path.join(OCR_path,ocr_file)):
+            ocr_file = file_name.replace('.jpg', '_text.txt')
     # with open(all_words_path, 'r') as file:
     #     all_words_ = json.load(file)
     all_words_ = gv_data(file_path, ocr_file = os.path.join(OCR_path,ocr_file))
     pre_data1 = main(all_words_)
-    print(pre_data1)
-
 
     geo_final_results = []
     for data_ in pre_data1:
@@ -402,7 +403,6 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
         print('>>>>>>>>>>>>>>>>>>')
         # print(data_['form'])
         out_json_obj = preprocessData(data_['form'], file_path)
-        print(out_json_obj)
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
@@ -417,23 +417,27 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     #result_generation('/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/custom_trial__/vis/Invoice_405_28_s_1_linking.png', '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/val_inference_files/dataset/results/_tagging.json')
     # return JSONResponse(content=geo_final_result,status_code=200)
 
+
+log_file = "processing_times.txt"
+
 import time
 if __name__ == '__main__':
-    images_path = '/datadrive/aryan_poc/val_samples'
-    OCR_path = '/datadrive/aryan_poc/OCR'
+    images_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/Images/CI/img'
+    OCR_path = '/home/ntlpt19/TF_testing_EXT/dummy_responces/itf_testing_feb10/OCR'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)
-    for images_files in os.listdir(images_path):
-        # if images_files not in ['IM-000000016466851-AP_page_0.png']:
-        #     continue
-        if not os.path.exists(os.path.join(geo_dump_dir, images_files)):
-            image_base64_ = image_to_base64(os.path.join(images_path, images_files))
-            start_time = time.time()
-            get_geo_result_final(image_base64_, os.path.join(images_path, images_files), OCR_path)
-            time_taken = time.time() - start_time
-            print(f"TIME TAKEN FOR RESULT GENERATION {time_taken:.2f} seconds.")
-        else:
-            print(f'File {images_files} already exists.')
-            
-            
+    with open(log_file, "a") as f:
+        for images_files in os.listdir(images_path):
+            # if images_files not in ['IM-000000016466851-AP_page_0.png']:
+            #     continue
+            if not os.path.exists(os.path.join(geo_dump_dir, images_files)):
+                image_base64_ = image_to_base64(os.path.join(images_path, images_files))
+                start_time = time.time()
+                get_geo_result_final(image_base64_, os.path.join(images_path, images_files), OCR_path)
+                time_taken = time.time() - start_time
+                print(f"TIME TAKEN FOR RESULT GENERATION {time_taken:.2f} seconds.")
+                f.write(f"{images_files}, {time_taken:.2f} seconds\n")
+            else:
+                print(f'File {images_files} already exists.')
+                

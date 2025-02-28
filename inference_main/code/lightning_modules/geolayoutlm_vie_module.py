@@ -135,8 +135,9 @@ class GeoLayoutLMVIEModule(BROSModule):
 def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
     loss = loss["total_loss"]
     step_out_labeling, final_results = do_eval_step_ee(batch, head_outputs, loss, eval_kwargs, dump_dir)
-    step_out_linking = do_eval_step_el(batch, head_outputs, loss, eval_kwargs, dump_dir)
-    step_out = {"labeling": step_out_labeling, "linking": step_out_linking}
+    # step_out_linking = do_eval_step_el(batch, head_outputs, loss, eval_kwargs, dump_dir)
+    # step_out = {"labeling": step_out_labeling, "linking": step_out_linking}
+    step_out = {"labeling": step_out_labeling, "linking": []}
     return step_out, final_results
 
 

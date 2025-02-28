@@ -142,27 +142,30 @@ class GeoLayoutLMVIEModel(nn.Module):
             bio_text_mm_feat = self.dropout(text_mm_feat)
             logits4labeling = self.bio_classifier(bio_text_mm_feat) # [batch_size, seq_len, nc]
         
-        # RE
-        batch_size, blk_len = first_token_idxes.shape
-        B_batch_dim = torch.arange(0, batch_size,
-            device=text_mm_feat.device).reshape(
-            batch_size,1).expand(batch_size, blk_len)
+        #added empty list
+        logits4linking_list = []
         
-        text_mm_blk_features = text_mm_feat[B_batch_dim, first_token_idxes]
-        text_mm_blk_features = text_mm_blk_features * first_token_idxes_mask.unsqueeze(2)
+        # RE
+        # batch_size, blk_len = first_token_idxes.shape
+        # B_batch_dim = torch.arange(0, batch_size,
+        #     device=text_mm_feat.device).reshape(
+        #     batch_size,1).expand(batch_size, blk_len)
+        
+        # text_mm_blk_features = text_mm_feat[B_batch_dim, first_token_idxes]
+        # text_mm_blk_features = text_mm_blk_features * first_token_idxes_mask.unsqueeze(2)
 
-        if self.model_cfg.backbone in [
-            "alibaba-damo/geolayoutlm-base-uncased",
-            "alibaba-damo/geolayoutlm-large-uncased",
-        ]:        
-            visual_mm_blk_features = vis_mm_feat[:,1:] # the global image feature; [batch_size, block_num, hidden_size]
-            mixed_blk_features = self.dropout(visual_mm_blk_features + text_mm_blk_features)
+        # if self.model_cfg.backbone in [
+        #     "alibaba-damo/geolayoutlm-base-uncased",
+        #     "alibaba-damo/geolayoutlm-large-uncased",
+        # ]:        
+        #     visual_mm_blk_features = vis_mm_feat[:,1:] # the global image feature; [batch_size, block_num, hidden_size]
+        #     mixed_blk_features = self.dropout(visual_mm_blk_features + text_mm_blk_features)
 
-            logits4linking_list = []
-            logits4linking = self.pair_geometric_head(mixed_blk_features) # [batch_size, block_num, block_num]
-            logits4linking_list.append(logits4linking)
-            logits4linking_ref = self.multi_pairs_geometric_head(mixed_blk_features, logits4linking, first_token_idxes_mask)
-            logits4linking_list.append(logits4linking_ref)
+        #     logits4linking_list = []
+        #     logits4linking = self.pair_geometric_head(mixed_blk_features) # [batch_size, block_num, block_num]
+        #     logits4linking_list.append(logits4linking)
+        #     logits4linking_ref = self.multi_pairs_geometric_head(mixed_blk_features, logits4linking, first_token_idxes_mask)
+        #     logits4linking_list.append(logits4linking_ref)
 
         # output and loss
         head_outputs = {
@@ -175,12 +178,16 @@ class GeoLayoutLMVIEModel(nn.Module):
                 "alibaba-damo/geolayoutlm-large-uncased",
             ]
         }
-        head_outputs["pred4linking"] = torch.where(
-            torch.sigmoid(head_outputs["logits4linking_list"][-1]) >= 0.5, \
-            torch.ones_like(head_outputs["logits4linking_list"][-1]),
-            torch.zeros_like(head_outputs["logits4linking_list"][-1]))
-        losses = self._get_loss(head_outputs, batch)
-
+        
+        # head_outputs["pred4linking"] = torch.where(
+        #     torch.sigmoid(head_outputs["logits4linking_list"][-1]) >= 0.5, \
+        #     torch.ones_like(head_outputs["logits4linking_list"][-1]),
+        #     torch.zeros_like(head_outputs["logits4linking_list"][-1]))
+        
+        # losses = self._get_loss(head_outputs, batch)
+        
+        losses = {}
+        losses["total_loss"] = 0.01
         return head_outputs, losses
 
     def _get_loss(self, head_outputs, batch):

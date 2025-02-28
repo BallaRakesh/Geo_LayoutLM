@@ -363,6 +363,17 @@ def gen_data_in_funsd_format(root_path):
             json.dump({"form" : final_data}, f, indent=4)
             
 
+import argparse
 if __name__ == "__main__":
-    ROOT_PATH = "/datadrive/aryan_poc"
+    parser = argparse.ArgumentParser(description="Custom Data Generation Script")
+    parser.add_argument(
+        "--root_path",
+        default = '/',
+        help="Root directory path",
+        type=str,
+        required=False,
+    )
+    args = parser.parse_args()
+    ROOT_PATH = args.root_path
+    # ROOT_PATH = "/root/rakesh/data/BOE"
     gen_data_in_funsd_format(ROOT_PATH)
