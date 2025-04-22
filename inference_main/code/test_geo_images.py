@@ -54,6 +54,7 @@ from fastapi import FastAPI,Request
 from io import BytesIO
 import base64
 from model_saving_eval_mode import save_loaded_model
+from datetime import datetime
 
 
 
@@ -360,6 +361,10 @@ def image_to_base64(image_path):
 
 
 
+from setup_logger import CustomLogger
+log = CustomLogger(log_folder_name="/logging/")
+log_file_name = f"{__name__}"
+log.generate_logger_object(log_file_name, ignore_time=True)
 
 
 
@@ -383,6 +388,7 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     # # all_words_path = '/home/ntlpt19/Downloads/MERGED_DATA/GEO_Latest/geolayoutlm_code_base_2/CI_EVAL/all_words/Invoice_405_28.json'
     # img_path = os.path.join(img_path, file_name)
     file_name = os.path.basename(file_path)
+    overall_start = datetime.now()
     print(file_name)
     if '.png' in file_name:
         ocr_file = file_name.replace('.png', '_textAndCoordinates.txt')
@@ -396,20 +402,37 @@ def get_geo_result_final(image_base64, file_path, OCR_path):
     #     all_words_ = json.load(file)
     all_words_ = gv_data(file_path, ocr_file = os.path.join(OCR_path,ocr_file))
     pre_data1 = main(all_words_)
-
+    num_clusters = 1
     geo_final_results = []
     for data_ in pre_data1:
-        print('>>>>>>>>>>>>>>>>>>')
-        print('>>>>>>>>>>>>>>>>>>')
+        log.logger_object.critical(f"PROCESS STARTED FOR CLUSTER: {num_clusters}")
+        ######################################################
+        t_start = datetime.now()
         # print(data_['form'])
         out_json_obj = preprocessData(data_['form'], file_path)
+        t_end = datetime.now()
+        print(f"Time Taken for out_json_obj: {t_end - t_start} seconds ")
+        ######################################################
+        log.logger_object.critical(f"Time Taken for out_json_obj : {t_end - t_start} seconds ")
         image_path = out_json_obj['meta']['image_path']
         image = Image.open(image_path)
+        ######################################################
+        t_start = datetime.now()
         pr_labels, geo_results = predict(loaded_model, image, out_json_obj, backbone_type='geolayoutlm')
+        t_end = datetime.now()
+        ######################################################
+        log.logger_object.critical(f"Time Taken for Model prediction : {t_end - t_start} seconds ")
         # print(geo_results)
         geo_final_results.extend(geo_results[0])
-    # exit('OKKKKKKKKKKKKKKKKKKKKKK')
+        num_clusters += 1
+    ############################################################
+    t_start = datetime.now()
     geo_final_result = result_generation(file_path, geo_final_results, all_words_)
+    t_end = datetime.now()
+    log.logger_object.critical(f"Time Taken for merging bbox : {t_end - t_start} seconds ")
+    ############################################################
+    overall_end = datetime.now()
+    log.logger_object.critical(f"overall process time : {overall_end - overall_start} seconds ")
     print(file_name)
     print(geo_final_result)
 
@@ -422,8 +445,8 @@ log_file = "processing_times.txt"
 
 import time
 if __name__ == '__main__':
-    images_path = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Eval_data/CI/v2/Images'
-    OCR_path = '/home/ntlpt19/Downloads/Final_Delivery_Training_itter_5/Eval_data/CI/v2/OCR'
+    images_path = '/datadrive2/rakesh/geo_temp_testing_data/data/iamges'
+    OCR_path = '/datadrive2/rakesh/geo_temp_testing_data/data/OCR/Coordinates'
     
     # data_path = '/datadrive/geo_data/grasim_test_samples/data'
     os.makedirs(geo_dump_dir, exist_ok=True)
