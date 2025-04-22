@@ -188,10 +188,10 @@ def predict(net, image, json_obj, backbone_type='geolayoutlm'):
 
 
 
+tokenizer_bert = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+
 def preprocessData(json_file:Dict, img_path, MAX_SEQ_LENGTH = 512, MODEL_TYPE = "bert", 
                     VOCA = "bert-base-uncased"):
-    tokenizer = BertTokenizer.from_pretrained(VOCA, do_lower_case=True)
-    
     
     
     ######################################################
@@ -266,7 +266,7 @@ def preprocessData(json_file:Dict, img_path, MAX_SEQ_LENGTH = 512, MODEL_TYPE = 
             print(bb)
             # exit('++++++++++++++')
             bb = [[bb[0], bb[1]], [bb[2], bb[1]], [bb[2], bb[3]], [bb[0], bb[3]]]
-            tokens = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(word_text))
+            tokens = tokenizer_bert.convert_tokens_to_ids(tokenizer_bert.tokenize(word_text))
             print(f'input id token:{tokens}')
             # exit('+++++++++++++')
 
