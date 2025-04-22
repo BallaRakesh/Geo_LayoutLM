@@ -13,21 +13,7 @@ import configparser
 config = configparser.ConfigParser()
 App_Filepath = os.path.dirname(os.path.abspath(__file__))
 config.read(os.path.dirname(App_Filepath) + '/config.ini')
-geo_clsses_path = config['PATH']['GEO_CLASSES_PATH']
-
-
-# Open and read the file line by line
-with open(geo_clsses_path, 'r') as file:
-    lines = file.readlines()
-
-# Remove any empty lines and strip whitespace
-keys = [line.strip() for line in lines if line.strip()]
-
-# Calculate the number of keys minus one
-num_classes = len(keys) - 1
-
-# Print or use num_classes as needed
-print("Number of classes:", num_classes)
+# geo_clsses_path = config['PATH']['GEO_CLASSES_PATH']
 
 
 # num_classes= 67
@@ -35,7 +21,7 @@ print("Number of classes:", num_classes)
 # num_classes= 31
 # with open()
 #/home/ntlpt-42/Documents/mani_projects/IDP/IDE/Geolayoutlm/geolayoutlm_code_base_2/configs/val_config.yml
-def get_config(default_conf_file="./configs/val_config.yml"):
+def get_config(geo_clsses_path, default_conf_file="./configs/val_config.yml"):
     cfg = OmegaConf.load(default_conf_file)
 
     cfg_cli = _get_config_from_cli()
@@ -46,7 +32,7 @@ def get_config(default_conf_file="./configs/val_config.yml"):
 
     cfg = OmegaConf.merge(cfg, cfg_cli)
 
-    _update_config(cfg)
+    _update_config(cfg, geo_clsses_path)
 
     return cfg
 
@@ -62,7 +48,22 @@ def _get_config_from_cli():
     return cfg_cli
 
 
-def _update_config(cfg):
+def _update_config(cfg, geo_clsses_path):
+    
+    # Open and read the file line by line
+    with open(geo_clsses_path, 'r') as file:
+        lines = file.readlines()
+
+    # Remove any empty lines and strip whitespace
+    keys = [line.strip() for line in lines if line.strip()]
+
+    # Calculate the number of keys minus one
+    num_classes = len(keys) - 1
+
+    # Print or use num_classes as needed
+    print("Number of classes:", num_classes)
+
+    
     # if os.path.exists(cfg.workspace):
     #     cfg.workspace = cfg.workspace.rstrip('/') + '_' + datetime.datetime.now().strftime('%m%d%H%M')
     cfg.save_weight_dir = os.path.join(cfg.workspace, "checkpoints")
