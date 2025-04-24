@@ -18,7 +18,7 @@ from utils import get_class_names, cfg_to_hparams, get_specific_pl_logger
 
 TOKENIZER = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
 
-class GeoLayoutLMVIEModule(BROSModule):
+class GeoLayoutLMVIEModule_old(BROSModule):
     
     def __init__(self, cfg):
         super().__init__(cfg)
@@ -126,6 +126,121 @@ class GeoLayoutLMVIEModule(BROSModule):
         # free memory
         self.validation_step_outputs.clear()
 
+
+
+class GeoLayoutLMVIEModule(BROSModule):
+    
+    def __init__(self, cfg):
+        super().__init__(cfg)
+        self.validation_step_outputs = []
+        self.training_step_outputs = []
+        class_names = get_class_names(self.cfg.dataset_root_path)
+        bio_class_names = ["O"]
+        for class_name in class_names:
+            if class_name.upper() != 'O':
+                bio_class_names.extend([f"B-{class_name}", f"I-{class_name}"])
+        self.eval_kwargs = {
+            "bio_class_names": bio_class_names,
+        }
+
+        self.f1_res = {
+            "f1_labeling": 0.0,
+            "f1_linking": 0.0,
+            "f1_all": 0.0,
+        }
+        self.max_f1 = {
+            "f1_labeling": (-1, 0.0),
+            "f1_linking": (-1, 0.0),
+        }
+
+    @overrides
+    def training_step(self, batch, batch_idx, *args):
+        _, loss_dict = self.net(batch)
+        loss = loss_dict["total_loss"]
+
+        log_dict_input = {
+            "train_loss": loss, 
+            "train_loss_labeling": loss_dict["labeling_loss"], 
+            "train_loss_linking": loss_dict["linking_loss"]
+        }
+        self.log_dict(log_dict_input, sync_dist=False)
+        ret_loss = {
+            "loss": loss,  # Keep as tensor for backpropagation
+            "loss_labeling": loss_dict["labeling_loss"].item(),  # Scalar for logging
+            "loss_linking": loss_dict["linking_loss"].item(),    # Scalar for logging
+        }
+        # Store only scalars in training_step_outputs to avoid graph retention
+        self.training_step_outputs.append({
+            "loss": loss.item(),
+            "loss_labeling": loss_dict["labeling_loss"].item(),
+            "loss_linking": loss_dict["linking_loss"].item(),
+        })
+        return ret_loss
+
+    @overrides
+    def on_train_epoch_end(self):
+        avg_loss = 0.0
+        avg_labeling_loss = 0.0
+        avg_linking_loss = 0.0
+        n_outputs = max(1, len(self.training_step_outputs))
+        
+        for step_out in self.training_step_outputs:
+            avg_loss += step_out["loss"]
+            avg_labeling_loss += step_out["loss_labeling"]
+            avg_linking_loss += step_out["loss_linking"]
+
+        log_dict = {
+            "total_loss": avg_loss / n_outputs, 
+            "labeling_loss": avg_labeling_loss / n_outputs,
+            "linking_loss": avg_linking_loss / n_outputs
+        }
+        self._log_shell(log_dict, prefix="train ")
+        self.training_step_outputs.clear()
+        # Explicitly trigger garbage collection
+        import gc
+        gc.collect()
+
+    @rank_zero_only
+    @overrides
+    def on_fit_end(self):
+        self.print('-' * 20 + ' Best F1 scores in ' + self.cfg.save_weight_dir + '-' * 20)
+        for k, v in self.max_f1.items():
+            self.print(f'{k}: {v[1]:.2%} at epoch {v[0]}')
+        
+        hparam_dict = cfg_to_hparams(self.cfg, {})
+
+        tb_logger = get_specific_pl_logger(self.logger, TensorBoardLogger)
+
+        if tb_logger:
+            tb_logger.log_hyperparams(hparam_dict, self.f1_res)
+
+    @torch.no_grad()
+    @overrides
+    def validation_step(self, batch, batch_idx, *args):
+        head_outputs, loss_dict = self.net(batch)
+        step_out = do_eval_step(batch, head_outputs, loss_dict, self.eval_kwargs)
+        self.validation_step_outputs.append(step_out)
+        return step_out
+
+    @torch.no_grad()
+    @overrides
+    def on_validation_epoch_end(self):
+        scores = do_eval_epoch_end(self.validation_step_outputs)
+        for task_name, score_task in scores.items():
+            self.f1_res[f'f1_{task_name}'] = score_task['f1']
+            suffix = ''
+            if self.current_epoch > 0 and self.max_f1[f'f1_{task_name}'][1] < self.f1_res[f'f1_{task_name}']:
+                self.max_f1[f'f1_{task_name}'] = (self.current_epoch, self.f1_res[f'f1_{task_name}'])
+                suffix = ' (BEST BY NOW) '
+            self.print(
+                f"{task_name} --> precision: {score_task['precision']:.4f}, recall: {score_task['recall']:.4f}, f1: {score_task['f1']:.4f}{suffix}"
+            )
+        self.f1_res['f1_all'] = self.f1_res['f1_labeling'] + self.f1_res['f1_linking']
+        self.log_dict(self.f1_res)
+        self.validation_step_outputs.clear()
+        # Explicitly trigger garbage collection
+        import gc
+        gc.collect()
 
 def do_eval_step(batch, head_outputs, loss, eval_kwargs, dump_dir=''):
     loss = loss["total_loss"]

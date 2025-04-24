@@ -25,18 +25,18 @@ model:
 
 train:
   batch_size: 1
-  num_samples_per_epoch: 80
+  num_samples_per_epoch: 5
   max_seq_length: 512
   max_block_num: 150
   max_epochs: 50
   use_fp16: False
-  accelerator: gpu
+  accelerator: cpu
   strategy:
     type: ""
 
   clip_gradient_algorithm: norm
   clip_gradient_value: 1.0
-  num_workers: 2
+  num_workers: 1
 
   optimizer:
     method: adamw

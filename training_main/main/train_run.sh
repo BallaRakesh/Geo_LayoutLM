@@ -12,14 +12,14 @@ fi
 
 #start process
 
-python3 funsd_gv.py --root_path $ROOT_PATH
-echo "Data preprocessing is Done!! stage1"
+# python3 funsd_gv.py --root_path $ROOT_PATH
+# echo "Data preprocessing is Done!! stage1"
 
-python3 preprocess/custom/prepare_data_final.py --root_path $ROOT_PATH
-echo "Data preprocessing is Done!! stage2"
+# python3 preprocess/custom/prepare_data_final.py --root_path $ROOT_PATH
+# echo "Data preprocessing is Done!! stage2"
 
-python3 preprocess/custom/preprocess_for_training.py --root_path $ROOT_PATH
-echo "Data preprocessing is Done!! stage3"
+# python3 preprocess/custom/preprocess_for_training.py --root_path $ROOT_PATH
+# echo "Data preprocessing is Done!! stage3"
 
 
 OUT_FILE_NAME=$(python3 -c "import constants; print(getattr(constants, 'out_file_name', 'train_output.log'))")

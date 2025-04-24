@@ -57,6 +57,12 @@ from model_saving_eval_mode import save_loaded_model
 from datetime import datetime
 
 
+from setup_logger import CustomLogger
+log = CustomLogger(log_folder_name="/logging/")
+log_file_name = f"{__name__}"
+log.generate_logger_object(log_file_name, ignore_time=True)
+
+
 
 App_Filepath = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
@@ -132,7 +138,9 @@ def load_model():
     net.to(device)
     # Set model to evaluation mode
     net.eval()
-    # save_loaded_model(net, '/media/ntlpt19/5250315B5031474F/TradeFinance_Geo/eval_mode_save', filename = pt_filename)
+    
+    # pt_filename = 'bol_eval_mode_save.pth'
+    # save_loaded_model(net, '/datadrive2/rakesh/geo_temp_testing_data/bol_eval_data/model', filename = pt_filename)
     # exit('>>>>>>>>.')
     
     # If you need the device the model is on, you can still check it
@@ -340,9 +348,33 @@ app= FastAPI()
 
 
 
-loaded_model = load_model() 
-print("loaded successfully")
+# loaded_model = load_model() 
+# print("loaded successfully")
 
+import time
+import psutil
+import os
+import gc
+
+# Clear unused memory before measuring
+gc.collect()
+
+# Record memory before loading
+process = psutil.Process(os.getpid())
+mem_before = process.memory_info().rss / (1024 ** 2)  # in MB
+# Record time before loading
+load_start_time = time.time()
+# Load model
+loaded_model = load_model()
+# Record time after loading
+load_end_time = time.time()
+# Record memory after loading
+mem_after = process.memory_info().rss / (1024 ** 2)  # in MB
+print("Model loaded successfully ✅")
+print(f"Time taken: {load_end_time - load_start_time:.4f} seconds ⏱️")
+log.logger_object.critical(f"Time taken: {load_end_time - load_start_time:.4f} seconds ⏱️")
+print(f"Memory used: {mem_after - mem_before:.4f} MB 🧠")
+log.logger_object.critical(f"Memory used: {mem_after - mem_before:.4f} MB 🧠")
 
 
 def image_to_base64(image_path):
@@ -359,12 +391,6 @@ def image_to_base64(image_path):
     return base64_string
 
 
-
-
-from setup_logger import CustomLogger
-log = CustomLogger(log_folder_name="/logging/")
-log_file_name = f"{__name__}"
-log.generate_logger_object(log_file_name, ignore_time=True)
 
 
 

@@ -64,7 +64,8 @@ class VIEDataModule(pl.LightningDataModule):
             batch_size=self.cfg.train.batch_size,
             shuffle=True,
             num_workers=self.cfg.train.num_workers,
-            pin_memory=True,
+            # pin_memory=True,
+            pin_memory=False,
         )
 
         elapsed_time = time.time() - start_time
