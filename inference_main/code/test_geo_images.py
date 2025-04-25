@@ -482,11 +482,11 @@ if __name__ == '__main__':
             #     continue
             if not os.path.exists(os.path.join(geo_dump_dir, images_files)):
                 image_base64_ = image_to_base64(os.path.join(images_path, images_files))
-                start_time = time.time()
+                final_start_time = time.time()
                 get_geo_result_final(image_base64_, os.path.join(images_path, images_files), OCR_path)
-                time_taken = time.time() - start_time
-                print(f"TIME TAKEN FOR RESULT GENERATION {time_taken:.2f} seconds.")
-                f.write(f"{images_files}, {time_taken:.2f} seconds\n")
+                final_time_taken = time.time() - final_start_time
+                print(f"TIME TAKEN FOR RESULT GENERATION {final_time_taken:.2f} seconds.")
+                f.write(f"{images_files}, {final_time_taken:.2f} seconds\n")
             else:
                 print(f'File {images_files} already exists.')
                 

@@ -48,3 +48,466 @@
 2025-04-22 12:20:16 CRITICAL Line No:424 Time Taken for Model prediction : 0:00:01.826144 seconds 
 2025-04-22 12:20:17 CRITICAL Line No:432 Time Taken for merging bbox : 0:00:00.343272 seconds 
 2025-04-22 12:20:17 CRITICAL Line No:435 overall process time : 0:00:10.605669 seconds 
+2025-04-22 17:43:19 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-22 17:43:19 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-22 17:43:19 INFO Line No:71 * Group: Number Theory
+2025-04-22 17:43:19 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-22 17:43:19 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-22 17:43:19 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-22 17:43:26 CRITICAL Line No:373 Time taken: 6.9700 seconds ⏱️
+2025-04-22 17:43:26 CRITICAL Line No:375 Memory used: 3062.5938 MB 🧠
+2025-04-22 17:43:27 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 1
+2025-04-22 17:43:27 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.012771 seconds 
+2025-04-22 17:43:29 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.501662 seconds 
+2025-04-22 17:43:29 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 2
+2025-04-22 17:43:29 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.012360 seconds 
+2025-04-22 17:43:32 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.079396 seconds 
+2025-04-22 17:43:32 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 3
+2025-04-22 17:43:32 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.018030 seconds 
+2025-04-22 17:43:34 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.996102 seconds 
+2025-04-22 17:43:34 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 4
+2025-04-22 17:43:34 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.013608 seconds 
+2025-04-22 17:43:36 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.966856 seconds 
+2025-04-22 17:43:36 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 5
+2025-04-22 17:43:36 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.008070 seconds 
+2025-04-22 17:43:37 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.818185 seconds 
+2025-04-22 17:43:38 CRITICAL Line No:456 Time Taken for merging bbox : 0:00:00.361593 seconds 
+2025-04-22 17:43:38 CRITICAL Line No:459 overall process time : 0:00:11.213326 seconds 
+2025-04-22 17:44:24 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-22 17:44:24 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-22 17:44:24 INFO Line No:71 * Group: Number Theory
+2025-04-22 17:44:24 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-22 17:44:24 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-22 17:44:24 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-22 17:44:31 CRITICAL Line No:373 Time taken: 5.9804 seconds ⏱️
+2025-04-22 17:44:31 CRITICAL Line No:375 Memory used: 3062.3516 MB 🧠
+2025-04-22 17:44:31 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 1
+2025-04-22 17:44:31 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.011389 seconds 
+2025-04-22 17:44:33 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.433516 seconds 
+2025-04-22 17:44:33 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 2
+2025-04-22 17:44:33 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.019555 seconds 
+2025-04-22 17:44:36 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.394713 seconds 
+2025-04-22 17:44:36 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 3
+2025-04-22 17:44:36 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.012069 seconds 
+2025-04-22 17:44:38 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.046496 seconds 
+2025-04-22 17:44:38 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 4
+2025-04-22 17:44:38 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.013847 seconds 
+2025-04-22 17:44:40 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.938350 seconds 
+2025-04-22 17:44:40 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 5
+2025-04-22 17:44:40 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.008122 seconds 
+2025-04-22 17:44:42 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.937485 seconds 
+2025-04-22 17:44:42 CRITICAL Line No:456 Time Taken for merging bbox : 0:00:00.337511 seconds 
+2025-04-22 17:44:42 CRITICAL Line No:459 overall process time : 0:00:11.548817 seconds 
+2025-04-22 17:47:59 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-22 17:47:59 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-22 17:47:59 INFO Line No:71 * Group: Number Theory
+2025-04-22 17:47:59 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-22 17:47:59 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-22 17:47:59 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-22 17:48:06 CRITICAL Line No:373 Time taken: 5.8568 seconds ⏱️
+2025-04-22 17:48:06 CRITICAL Line No:375 Memory used: 3062.2539 MB 🧠
+2025-04-22 17:48:06 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 1
+2025-04-22 17:48:06 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.014030 seconds 
+2025-04-22 17:48:09 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.436251 seconds 
+2025-04-22 17:48:09 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 2
+2025-04-22 17:48:09 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.016776 seconds 
+2025-04-22 17:48:11 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.247400 seconds 
+2025-04-22 17:48:11 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 3
+2025-04-22 17:48:11 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.013109 seconds 
+2025-04-22 17:48:13 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:02.039017 seconds 
+2025-04-22 17:48:13 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 4
+2025-04-22 17:48:13 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.016362 seconds 
+2025-04-22 17:48:15 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.873136 seconds 
+2025-04-22 17:48:15 CRITICAL Line No:432 PROCESS STARTED FOR CLUSTER: 5
+2025-04-22 17:48:15 CRITICAL Line No:440 Time Taken for out_json_obj : 0:00:00.006868 seconds 
+2025-04-22 17:48:17 CRITICAL Line No:448 Time Taken for Model prediction : 0:00:01.975091 seconds 
+2025-04-22 17:48:17 CRITICAL Line No:456 Time Taken for merging bbox : 0:00:00.351776 seconds 
+2025-04-22 17:48:17 CRITICAL Line No:459 overall process time : 0:00:11.409923 seconds 
+2025-04-24 08:59:25 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-24 08:59:25 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-24 08:59:25 INFO Line No:71 * Group: Number Theory
+2025-04-24 08:59:25 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-24 08:59:25 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-24 08:59:25 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-24 09:08:29 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-24 09:08:29 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-24 09:08:29 INFO Line No:71 * Group: Number Theory
+2025-04-24 09:08:29 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-24 09:08:29 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-24 09:08:29 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-24 09:08:38 CRITICAL Line No:375 Time taken: 7.6651 seconds ⏱️
+2025-04-24 09:08:38 CRITICAL Line No:377 Memory used: 3062.0195 MB 🧠
+2025-04-24 09:08:38 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 09:08:38 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.190812 seconds 
+2025-04-24 09:08:41 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.148713 seconds 
+2025-04-24 09:08:41 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 09:08:41 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.038069 seconds 
+2025-04-24 09:08:43 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.033719 seconds 
+2025-04-24 09:08:43 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 09:08:43 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.022384 seconds 
+2025-04-24 09:08:46 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.709435 seconds 
+2025-04-24 09:08:47 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.857220 seconds 
+2025-04-24 09:08:47 CRITICAL Line No:461 overall process time : 0:00:08.605353 seconds 
+2025-04-24 09:08:47 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 09:08:47 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.015627 seconds 
+2025-04-24 09:08:49 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.125676 seconds 
+2025-04-24 09:08:49 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 09:08:49 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011138 seconds 
+2025-04-24 09:08:51 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.214784 seconds 
+2025-04-24 09:08:51 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 09:08:51 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.016849 seconds 
+2025-04-24 09:08:53 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.217596 seconds 
+2025-04-24 09:08:53 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.216317 seconds 
+2025-04-24 09:08:53 CRITICAL Line No:461 overall process time : 0:00:06.964274 seconds 
+2025-04-24 09:08:54 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 09:08:54 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.117383 seconds 
+2025-04-24 09:08:57 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.789211 seconds 
+2025-04-24 09:08:57 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 09:08:57 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.017945 seconds 
+2025-04-24 09:08:59 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.178656 seconds 
+2025-04-24 09:08:59 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 09:08:59 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.022032 seconds 
+2025-04-24 09:09:01 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.159136 seconds 
+2025-04-24 09:09:01 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-24 09:09:01 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.018878 seconds 
+2025-04-24 09:09:03 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.099193 seconds 
+2025-04-24 09:09:03 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.367178 seconds 
+2025-04-24 09:09:03 CRITICAL Line No:461 overall process time : 0:00:10.002257 seconds 
+2025-04-24 09:09:04 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 09:09:04 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.017190 seconds 
+2025-04-24 09:09:06 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.029799 seconds 
+2025-04-24 09:09:06 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 09:09:06 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.026049 seconds 
+2025-04-24 09:09:08 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.977318 seconds 
+2025-04-24 09:09:08 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 09:09:08 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.020555 seconds 
+2025-04-24 09:09:10 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.100999 seconds 
+2025-04-24 09:09:10 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-24 09:09:10 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.006692 seconds 
+2025-04-24 09:09:12 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.019287 seconds 
+2025-04-24 09:09:12 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.306431 seconds 
+2025-04-24 09:09:12 CRITICAL Line No:461 overall process time : 0:00:08.735283 seconds 
+2025-04-24 09:09:13 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 09:09:13 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.155876 seconds 
+2025-04-24 09:09:15 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.024674 seconds 
+2025-04-24 09:09:15 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 09:09:15 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.020812 seconds 
+2025-04-24 09:09:17 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.291658 seconds 
+2025-04-24 09:09:17 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 09:09:17 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.027325 seconds 
+2025-04-24 09:09:19 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.029074 seconds 
+2025-04-24 09:09:19 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-24 09:09:19 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.031775 seconds 
+2025-04-24 09:09:22 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.222847 seconds 
+2025-04-24 09:09:22 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-24 09:09:22 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.022793 seconds 
+2025-04-24 09:09:24 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.085778 seconds 
+2025-04-24 09:09:24 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 62025-04-24 11:57:49 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-24 11:57:49 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-24 11:57:49 INFO Line No:71 * Group: Number Theory
+2025-04-24 11:57:49 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-24 11:57:49 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-24 11:57:49 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-24 11:57:55 CRITICAL Line No:375 Time taken: 5.1905 seconds ⏱️
+2025-04-24 11:57:55 CRITICAL Line No:377 Memory used: 3061.4609 MB 🧠
+2025-04-24 11:57:55 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 11:57:55 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.016167 seconds 
+2025-04-24 11:57:58 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.334912 seconds 
+2025-04-24 11:57:58 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 11:57:58 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.036035 seconds 
+2025-04-24 11:58:00 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.225601 seconds 
+2025-04-24 11:58:00 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 11:58:00 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.015878 seconds 
+2025-04-24 11:58:02 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.251793 seconds 
+2025-04-24 11:58:02 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-24 11:58:02 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.017420 seconds 
+2025-04-24 11:58:04 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.975560 seconds 
+2025-04-24 11:58:04 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-24 11:58:04 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.013024 seconds 
+2025-04-24 11:58:06 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.053329 seconds 
+2025-04-24 11:58:06 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.309879 seconds 
+2025-04-24 11:58:06 CRITICAL Line No:461 overall process time : 0:00:11.709984 seconds 
+2025-04-24 11:59:59 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-24 11:59:59 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-24 11:59:59 INFO Line No:71 * Group: Number Theory
+2025-04-24 11:59:59 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-24 11:59:59 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-24 11:59:59 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-24 12:00:06 CRITICAL Line No:375 Time taken: 6.4657 seconds ⏱️
+2025-04-24 12:00:06 CRITICAL Line No:377 Memory used: 3061.0664 MB 🧠
+2025-04-24 12:00:07 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-24 12:00:07 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.017454 seconds 
+2025-04-24 12:00:09 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.083094 seconds 
+2025-04-24 12:00:09 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-24 12:00:09 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.037017 seconds 
+2025-04-24 12:00:11 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.023535 seconds 
+2025-04-24 12:00:11 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-24 12:00:11 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.026013 seconds 
+2025-04-24 12:00:13 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.988119 seconds 
+2025-04-24 12:00:13 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-24 12:00:13 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.028515 seconds 
+2025-04-24 12:00:15 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.361357 seconds 
+2025-04-24 12:00:15 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-24 12:00:15 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011254 seconds 
+2025-04-24 12:00:18 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:02.222806 seconds 
+2025-04-24 12:00:18 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.324256 seconds 
+2025-04-24 12:00:18 CRITICAL Line No:461 overall process time : 0:00:11.501238 seconds 
+2025-04-25 10:11:59 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:11:59 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:11:59 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:11:59 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:11:59 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:11:59 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 10:12:04 CRITICAL Line No:375 Time taken: 4.8178 seconds ⏱️
+2025-04-25 10:12:04 CRITICAL Line No:377 Memory used: 3061.2148 MB 🧠
+2025-04-25 10:12:05 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 10:12:05 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.009755 seconds 
+2025-04-25 10:12:06 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.148427 seconds 
+2025-04-25 10:12:06 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 10:12:06 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011151 seconds 
+2025-04-25 10:12:07 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.157841 seconds 
+2025-04-25 10:12:07 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 10:12:07 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010118 seconds 
+2025-04-25 10:12:08 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.135285 seconds 
+2025-04-25 10:12:08 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 10:12:08 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.009804 seconds 
+2025-04-25 10:12:09 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.136888 seconds 
+2025-04-25 10:12:09 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 10:12:09 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.006829 seconds 
+2025-04-25 10:12:10 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.133620 seconds 
+2025-04-25 10:12:11 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.301281 seconds 
+2025-04-25 10:12:11 CRITICAL Line No:461 overall process time : 0:00:06.528823 seconds 
+2025-04-25 10:13:36 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:13:36 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:13:36 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:13:36 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:13:36 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:13:36 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+2025-04-25 10:14:41 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:14:41 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:14:41 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:14:41 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:14:41 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:14:41 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 10:14:46 CRITICAL Line No:375 Time taken: 4.7008 seconds ⏱️
+2025-04-25 10:14:46 CRITICAL Line No:377 Memory used: 3061.8945 MB 🧠
+2025-04-25 10:14:46 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 10:14:46 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.009745 seconds 
+2025-04-25 10:14:47 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.149336 seconds 
+2025-04-25 10:14:47 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 10:14:47 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012507 seconds 
+2025-04-25 10:14:49 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.224344 seconds 
+2025-04-25 10:14:49 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 10:14:49 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012118 seconds 
+2025-04-25 10:14:50 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.197387 seconds 
+2025-04-25 10:14:50 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 10:14:50 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010757 seconds 
+2025-04-25 10:14:51 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.133274 seconds 
+2025-04-25 10:14:51 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 10:14:51 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.005571 seconds 
+2025-04-25 10:14:52 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.133329 seconds 
+2025-04-25 10:14:52 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.299591 seconds 
+2025-04-25 10:14:52 CRITICAL Line No:461 overall process time : 0:00:06.491647 seconds 
+2025-04-25 10:15:59 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:15:59 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:15:59 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:15:59 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:15:59 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:15:59 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+2025-04-25 10:16:54 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:16:54 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:16:54 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:16:54 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:16:54 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:16:54 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 10:17:00 CRITICAL Line No:375 Time taken: 4.8160 seconds ⏱️
+2025-04-25 10:17:00 CRITICAL Line No:377 Memory used: 3061.0352 MB 🧠
+2025-04-25 10:17:00 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 10:17:00 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.125366 seconds 
+2025-04-25 10:17:01 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.142336 seconds 
+2025-04-25 10:17:01 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 10:17:01 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011669 seconds 
+2025-04-25 10:17:02 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.175758 seconds 
+2025-04-25 10:17:02 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 10:17:02 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.015108 seconds 
+2025-04-25 10:17:04 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.209678 seconds 
+2025-04-25 10:17:04 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 10:17:04 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012876 seconds 
+2025-04-25 10:17:05 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.133278 seconds 
+2025-04-25 10:17:05 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 10:17:05 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.005329 seconds 
+2025-04-25 10:17:06 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.127958 seconds 
+2025-04-25 10:17:06 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.295245 seconds 
+2025-04-25 10:17:06 CRITICAL Line No:461 overall process time : 0:00:06.579835 seconds 
+2025-04-25 10:18:14 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:18:14 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:18:14 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:18:14 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:18:14 INFO Line No:73 -----------------------------------------------------------------------------------------
+2025-04-25 10:23:02 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:23:02 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:23:02 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:23:02 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:23:02 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:23:02 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 10:23:08 CRITICAL Line No:375 Time taken: 4.7834 seconds ⏱️
+2025-04-25 10:23:08 CRITICAL Line No:377 Memory used: 3061.4609 MB 🧠
+2025-04-25 10:23:08 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 10:23:08 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010327 seconds 
+2025-04-25 10:23:10 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.162417 seconds 
+2025-04-25 10:23:10 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 10:23:10 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011382 seconds 
+2025-04-25 10:23:11 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.153100 seconds 
+2025-04-25 10:23:11 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 10:23:11 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012714 seconds 
+2025-04-25 10:23:12 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.139086 seconds 
+2025-04-25 10:23:12 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 10:23:12 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010702 seconds 
+2025-04-25 10:23:13 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.142423 seconds 
+2025-04-25 10:23:13 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 10:23:13 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.005675 seconds 
+2025-04-25 10:23:14 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.134135 seconds 
+2025-04-25 10:23:15 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.303951 seconds 
+2025-04-25 10:23:15 CRITICAL Line No:461 overall process time : 0:00:06.615267 seconds 
+2025-04-25 10:23:47 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 10:23:47 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 10:23:47 INFO Line No:71 * Group: Number Theory
+2025-04-25 10:23:47 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 10:23:47 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 10:23:47 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 10:23:53 CRITICAL Line No:375 Time taken: 4.8507 seconds ⏱️
+2025-04-25 10:23:53 CRITICAL Line No:377 Memory used: 3061.4297 MB 🧠
+2025-04-25 10:23:53 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 10:23:53 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.009919 seconds 
+2025-04-25 10:23:54 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.157132 seconds 
+2025-04-25 10:23:54 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 10:23:54 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012646 seconds 
+2025-04-25 10:23:55 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.134140 seconds 
+2025-04-25 10:23:55 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 10:23:55 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.013862 seconds 
+2025-04-25 10:23:56 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.136662 seconds 
+2025-04-25 10:23:56 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 10:23:56 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.013666 seconds 
+2025-04-25 10:23:57 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.133871 seconds 
+2025-04-25 10:23:57 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 10:23:57 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.007252 seconds 
+2025-04-25 10:23:59 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.130822 seconds 
+2025-04-25 10:23:59 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.292795 seconds 
+2025-04-25 10:23:59 CRITICAL Line No:461 overall process time : 0:00:06.294955 seconds 
+2025-04-25 13:37:11 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 13:37:11 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 13:37:11 INFO Line No:71 * Group: Number Theory
+2025-04-25 13:37:11 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 13:37:11 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 13:37:11 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 13:37:16 CRITICAL Line No:375 Time taken: 4.6952 seconds ⏱️
+2025-04-25 13:37:16 CRITICAL Line No:377 Memory used: 3061.5000 MB 🧠
+2025-04-25 13:37:34 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 13:37:34 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 13:37:34 INFO Line No:71 * Group: Number Theory
+2025-04-25 13:37:34 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 13:37:34 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 13:37:34 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 13:37:40 CRITICAL Line No:375 Time taken: 4.7648 seconds ⏱️
+2025-04-25 13:37:40 CRITICAL Line No:377 Memory used: 3061.5156 MB 🧠
+2025-04-25 13:37:40 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 13:37:40 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012309 seconds 
+2025-04-25 13:37:41 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.152692 seconds 
+2025-04-25 13:37:41 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 13:37:41 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.017072 seconds 
+2025-04-25 13:37:42 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.154104 seconds 
+2025-04-25 13:37:42 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 13:37:42 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012610 seconds 
+2025-04-25 13:37:44 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.176107 seconds 
+2025-04-25 13:37:44 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 13:37:44 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.012749 seconds 
+2025-04-25 13:37:45 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.182190 seconds 
+2025-04-25 13:37:45 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 13:37:45 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.006208 seconds 
+2025-04-25 13:37:46 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.129848 seconds 
+2025-04-25 13:37:46 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.294912 seconds 
+2025-04-25 13:37:46 CRITICAL Line No:461 overall process time : 0:00:06.482260 seconds 
+2025-04-25 13:38:09 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 13:38:09 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 13:38:09 INFO Line No:71 * Group: Number Theory
+2025-04-25 13:38:09 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 13:38:09 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 13:38:09 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 13:38:15 CRITICAL Line No:375 Time taken: 4.7406 seconds ⏱️
+2025-04-25 13:38:15 CRITICAL Line No:377 Memory used: 3062.2305 MB 🧠
+2025-04-25 13:38:15 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 13:38:15 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.082366 seconds 
+2025-04-25 13:38:16 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.189735 seconds 
+2025-04-25 13:38:16 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 13:38:16 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.016540 seconds 
+2025-04-25 13:38:18 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.187171 seconds 
+2025-04-25 13:38:18 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 13:38:18 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010149 seconds 
+2025-04-25 13:38:19 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.313304 seconds 
+2025-04-25 13:38:19 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 13:38:19 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010353 seconds 
+2025-04-25 13:38:20 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.127923 seconds 
+2025-04-25 13:38:20 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 13:38:20 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.005479 seconds 
+2025-04-25 13:38:21 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.123602 seconds 
+2025-04-25 13:38:21 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.295960 seconds 
+2025-04-25 13:38:21 CRITICAL Line No:461 overall process time : 0:00:06.797621 seconds 
+2025-04-25 13:41:25 INFO Line No:69 -----------------------------------------------------------------------------------------
+2025-04-25 13:41:25 INFO Line No:70                              NEWGEN SOFTWARE TECHNOLOGIES LIMITED
+2025-04-25 13:41:25 INFO Line No:71 * Group: Number Theory
+2025-04-25 13:41:25 INFO Line No:72 * Product/Project: Intelligent Trade Finance
+2025-04-25 13:41:25 INFO Line No:73 -----------------------------------------------------------------------------------------
+
+2025-04-25 13:41:25 INFO Line No:74 ############################ LOGGING FILE : /datadrive2/rakesh/Geo_LayoutLM/inference_main/code/../logs/Api_Call_Logs/logging/__main__.log #############################
+
+2025-04-25 13:41:30 CRITICAL Line No:375 Time taken: 4.7596 seconds ⏱️
+2025-04-25 13:41:30 CRITICAL Line No:377 Memory used: 3061.7656 MB 🧠
+2025-04-25 13:41:30 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 1
+2025-04-25 13:41:30 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.072109 seconds 
+2025-04-25 13:41:32 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.147181 seconds 
+2025-04-25 13:41:32 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 2
+2025-04-25 13:41:32 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.011809 seconds 
+2025-04-25 13:41:33 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.113316 seconds 
+2025-04-25 13:41:33 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 3
+2025-04-25 13:41:33 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010208 seconds 
+2025-04-25 13:41:34 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.115692 seconds 
+2025-04-25 13:41:34 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 4
+2025-04-25 13:41:34 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.010492 seconds 
+2025-04-25 13:41:35 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.123563 seconds 
+2025-04-25 13:41:35 CRITICAL Line No:434 PROCESS STARTED FOR CLUSTER: 5
+2025-04-25 13:41:35 CRITICAL Line No:442 Time Taken for out_json_obj : 0:00:00.005779 seconds 
+2025-04-25 13:41:36 CRITICAL Line No:450 Time Taken for Model prediction : 0:00:01.122290 seconds 
+2025-04-25 13:41:36 CRITICAL Line No:458 Time Taken for merging bbox : 0:00:00.291467 seconds 
+2025-04-25 13:41:36 CRITICAL Line No:461 overall process time : 0:00:06.240194 seconds 
